@@ -1,3 +1,181 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+{% endblock %}
 
 
-<h2>Hellow oh cruel world!</h2>
+{% block content %}
+    <b style="font-size: 24px">15/04: </b>
+
+    <br/>
+
+
+    <el-tree
+            :data="nodes"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="allowDrop"
+            :allow-drag="allowDrag"
+            :expand-on-click-node="false"
+            :render-content="renderContent">
+    </el-tree>
+
+    <el-tree
+            :data="nodes"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="allowDrop"
+            :allow-drag="allowDrag"
+            :expand-on-click-node="false"
+            :render-content="renderContent">
+    </el-tree>
+    <el-tree
+            :data="nodes"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="allowDrop"
+            :allow-drag="allowDrag"
+            :expand-on-click-node="false"
+            :render-content="renderContent">
+    </el-tree>
+    <el-tree
+            :data="nodes"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="allowDrop"
+            :allow-drag="allowDrag"
+            :expand-on-click-node="false"
+            :render-content="renderContent">
+    </el-tree>
+    <el-tree
+            :data="nodes"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            @node-drag-start="handleDragStart"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            draggable
+            :allow-drop="allowDrop"
+            :allow-drag="allowDrag"
+            :expand-on-click-node="false"
+            :render-content="renderContent">
+    </el-tree>
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+    <script>
+        var vue = new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+            data: {
+                nodes: [{
+                    id: 1,
+                    label: 'Nomarna',
+                    children: [{
+                        id: 4,
+                        label: 'Integración conekta',
+                        children: [{
+                            id: 9,
+                            label: 'Addcard() ... lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet '
+                        }, {
+                            id: 10,
+                            label: 'Persist default payment method'
+                        }]
+                    }]
+                }, {
+                    id: 2,
+                    label: 'Share',
+                    children: [{
+                        id: 5,
+                        label: 'Multi Share'
+                    }, {
+                        id: 6,
+                        label: 'Confirm dialog'
+                    }]
+                }]
+            },
+            methods: {
+                handleDragStart(node, ev) {
+                    console.log('drag start', node);
+                },
+                handleDragEnter(draggingNode, dropNode, ev) {
+                    console.log('tree drag enter: ', dropNode.label);
+                },
+                handleDragLeave(draggingNode, dropNode, ev) {
+                    console.log('tree drag leave: ', dropNode.label);
+                },
+                handleDragOver(draggingNode, dropNode, ev) {
+                    console.log('tree drag over: ', dropNode.label);
+                },
+                handleDragEnd(draggingNode, dropNode, dropType, ev) {
+                    console.log('tree drag end: ', dropNode && dropNode.label, dropType);
+                },
+                handleDrop(draggingNode, dropNode, dropType, ev) {
+                    console.log('tree drop: ', dropNode.label, dropType);
+                },
+                allowDrop(draggingNode, dropNode, type) {
+                    if (dropNode.data.label === 'Level two 3-1') {
+                        return type !== 'inner';
+                    } else {
+                        return true;
+                    }
+                },
+                allowDrag(draggingNode) {
+                    return draggingNode.data.label.indexOf('Level three 3-1-1') === -1;
+                }
+            }
+        })
+
+    </script>
+{% endblock %}
+

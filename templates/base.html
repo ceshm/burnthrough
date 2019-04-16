@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
+
+    <style>
+        div {
+            font-family: Quicksand, Sans-Serif;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+
+<div id="app">
+
+<el-container style="height: 100vh; border: 1px solid #eee">
+
+  <el-aside width="200px" style="background-color: rgb(238, 241, 246);">
+
+    <el-menu :default-openeds="['1', '3']">
+        <b style="padding: 10px; font-size: 22px; margin-top: 10px">BurnThrough</b>
+
+        <el-menu-item-group>
+            <el-menu-item index="2-1">Option 1</el-menu-item>
+            <el-menu-item index="2-2">Option 2</el-menu-item>
+        </el-menu-item-group>
+        <el-menu-item-group title="Group 2">
+            <el-menu-item index="2-3">Option 3</el-menu-item>
+        </el-menu-item-group>
+        <el-submenu index="2-4">
+            <template slot="title">Option 4</template>
+            <el-menu-item index="2-4-1">Option 4-1</el-menu-item>
+        </el-submenu>
+
+        {#
+        <el-submenu index="1">
+        <template slot="title"><i class="el-icon-message"></i>Perfil</template>
+        <el-menu-item-group>
+          <template slot="title">Group 1</template>
+          <el-menu-item index="1-1">Option 1</el-menu-item>
+          <el-menu-item index="1-2">Option 2</el-menu-item>
+        </el-menu-item-group>
+        <el-menu-item-group title="Group 2">
+          <el-menu-item index="1-3">Option 3</el-menu-item>
+        </el-menu-item-group>
+        <el-submenu index="1-4">
+          <template slot="title">Option4</template>
+          <el-menu-item index="1-4-1">Option 4-1</el-menu-item>
+        </el-submenu>
+      </el-submenu>
+        #}
+    </el-menu>
+
+    <el-footer>
+        <br/>
+        Footer
+    </el-footer>
+
+  </el-aside>
+
+  <el-container>
+
+    <el-header style="text-align: right; font-size: 12px; background-color: #f8f7ff; box-shadow: 0px 1px 2px rgba(0,0,0,.1); z-index: 11">
+
+        <el-date-picker
+      v-model="value1"
+      type="date"
+      placeholder="Change Day">
+    </el-date-picker>
+
+    </el-header>
+
+    <el-main>
+        {% block content %}{% endblock %}
+    </el-main>
+
+  </el-container>
+
+</el-container>
+</div>
+
+</body>
+
+<script src="//unpkg.com/vue"></script>
+<script src="//unpkg.com/element-ui"></script>
+<script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+
+<script>
+  ELEMENT.locale(ELEMENT.lang.en)
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</html>
