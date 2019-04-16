@@ -6,4 +6,4 @@ app = Starlette(debug=True)
 
 @app.route('/')
 async def homepage(request):
-    return PlainTextResponse('hello world')
+    return PlainTextResponse('hello cruel world')
