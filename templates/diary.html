@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+{% endblock %}
+
+{% block header %}
+    <el-button class="pull-left" type="primary" style="margin-top: 10px" v-on:click="save">Save</el-button>
+
+    <el-date-picker
+        v-model="date"
+        type="date"
+        placeholder="Change Day"
+        @change="dateChange"
+    >
+    </el-date-picker>
+{% endblock %}
+
+{% block content %}
+    <b style="font-size: 24px">{{ date.day }}/{{ date.month }}: </b>
+    <el-button
+        icon="el-icon-plus"
+        circle
+        class="pull-right"
+        style="padding: 8px"
+        @click="() => append()">
+    </el-button>
+    <br/>
+
+    <el-tree
+        :data="nodes"
+        node-key="id"
+        default-expand-all
+        @node-drag-start="handleDragStart"
+        @node-drag-enter="handleDragEnter"
+        @node-drag-leave="handleDragLeave"
+        @node-drag-over="handleDragOver"
+        @node-drag-end="handleDragEnd"
+        @node-drop="handleDrop"
+        draggable
+        :allow-drop="allowDrop"
+        :allow-drag="allowDrag"
+        :expand-on-click-node="false"
+        :render-content="renderContent"
+        style="height: 45px; padding-top: 10px"
+        {# @node-contextmenu="nodecontext"#}
+    >
+        <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%; background-color: transparent">
+            <span>
+            <el-popover
+                placement="bottom"
+                title=""
+                width="350"
+                trigger="click"
+                content="this is content, this is content, this is content"
+            >
+                <label>Name:</label><br/>
+                <input
+                    class="form-control input-sm"
+                    :data="node"
+                    :value="node.label"
+                    @change="(event) => taskeditname(event, node)"
+                    style="margin-bottom: 10px; box-shadow: none"
+                >
+                <label>Estimated Time:</label><br/>
+
+                <label style="margin-top: 8px">Time Spent:</label><br/>
+
+                <el-time-select
+                    placeholder="Start time"
+                    v-model="node.data.time_spent[0]"
+                    size="mini"
+                    :picker-options="{
+                      start: '08:30',
+                      step: '00:15',
+                      end: '23:30'
+                    }"
+                    style="width: 49%"
+                >
+                </el-time-select>
+                <el-time-select
+                    placeholder="End time"
+                    v-model="node.data.time_spent[1]"
+                    size="mini"
+                    :picker-options="{
+                      start: '08:30',
+                      step: '00:15',
+                      end: '23:30'
+                    }"
+                    style="width: 49%"
+                >
+                </el-time-select>
+                </template>
+
+                <span slot="reference">
+                    [[ node.label ]]
+                    <b>[[ node.data.time_spent[0] ]] <span v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</b>
+                </span>
+
+            </el-popover>
+            </span>
+
+            <span class="pull-right">
+                <el-button
+                    size="mini"
+                    icon="el-icon-plus"
+                    circle
+                    style="padding: 2px"
+                    @click="() => append(data)">
+                </el-button>
+                <el-button
+                    size="mini"
+                    icon="el-icon-delete"
+                    circle
+                    style="padding: 2px"
+                    @click="() => remove(node, data)">
+                </el-button>
+            </span>
+
+        </span>
+    </el-tree>
+
+    <form method="post" ref="form">
+     <input type="hidden" name="nodes" id="nodes">
+    </form>
+
+{% endblock %}
+
+
+{% block extra_js %}
+    <script>
+
+        let traverseById = (id, node, label) => {
+            console.log(node.label);
+            console.log(node);
+            let childIndex = 0;
+            // intentemaos chequiar
+            ////console.log(id === node.id);
+            if(node.id === id){
+                node.label = label;
+                return node;
+            } else {
+                if(!!node.children){
+                    node.children.forEach(node=>traverseById(id, node, label));
+                }else{
+                    return null;
+                }
+            }
+        };
+        var vue = new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+            data: {
+                nodes: {% if tree %}{{ tree.nodes_to_str() | safe }}{% else %}[]{% endif %},
+                defaultProps: {
+                    children: 'children',
+                    label: 'label',
+                    time_spent: "time_spent"
+                },
+                date: null
+            },
+            methods: {
+                save(){
+                    console.log("Saving shit");
+                    $("#nodes").val(JSON.stringify(this.$data.nodes));
+                    console.log(JSON.stringify(this.$data.nodes));
+                    this.$refs.form.submit();
+                },
+                nodecontext(event, node){
+                    console.log("context");
+                    console.log(node);
+                },
+                taskeditname(event, node){
+                    console.log(node);
+                    traverseById(node.key, {id: -1, children: this.$data.nodes, label: "root"}, event.target.value);
+                },
+                append(data) {
+                    if (!!data) {
+                        const newChild = {
+                            id: Math.random().toString(36).substr(2, 9),
+                            label: 'task',
+                            time_spent: [null, null],
+                            children: []
+                        };
+                        if (!data.children) {
+                            this.$set(data, 'children', []);
+                        }
+                        data.children.push(newChild);
+                    }else{
+                        this.$data.nodes.push({
+                            id: Math.random().toString(36).substr(2, 9),
+                            label: 'task',
+                            time_spent: [null, null],
+                            children: []
+                        });
+                    }
+                },
+                remove(node, data) {
+                    const parent = node.parent;
+                    const children = parent.data.children || parent.data;
+                    const index = children.findIndex(d => d.id === data.id);
+                    children.splice(index, 1);
+                },
+                handleDragStart(node, ev) {
+                    console.log('drag start', node);
+                },
+                handleDragEnter(draggingNode, dropNode, ev) {
+                    console.log('tree drag enter: ', dropNode.label);
+                },
+                handleDragLeave(draggingNode, dropNode, ev) {
+                    console.log('tree drag leave: ', dropNode.label);
+                },
+                handleDragOver(draggingNode, dropNode, ev) {
+                    console.log('tree drag over: ', dropNode.label);
+                },
+                handleDragEnd(draggingNode, dropNode, dropType, ev) {
+                    console.log('tree drag end: ', dropNode && dropNode.label, dropType);
+                },
+                handleDrop(draggingNode, dropNode, dropType, ev) {
+                    console.log('tree drop: ', dropNode.label, dropType);
+                },
+                allowDrop(draggingNode, dropNode, type) {
+                    if (dropNode.data.label === 'Level two 3-1') {
+                        return type !== 'inner';
+                    } else {
+                        return true;
+                    }
+                },
+                allowDrag(draggingNode) {
+                    return draggingNode.data.label.indexOf('Level three 3-1-1') === -1;
+                },
+                dateChange(date){
+                    console.log(date.getFullYear(), date.getMonth()+1, date.getDate());
+                    window.location = "/diary/"+date.getFullYear()+"-"+(date.getMonth()+1).toString().padStart(2,'0')+"-"+date.getDate().toString().padStart(2,'0');
+
+                }
+            }
+        })
+
+
+    </script>
+{% endblock %}
+

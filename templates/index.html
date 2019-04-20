@@ -14,167 +14,54 @@
     </style>
 {% endblock %}
 
+{% block header %}
+
+{% endblock %}
 
 {% block content %}
-    <b style="font-size: 24px">15/04: </b>
 
-    <br/>
-
-
-    <el-tree
-            :data="nodes"
-            show-checkbox
-            node-key="id"
-            default-expand-all
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag"
-            :expand-on-click-node="false"
-            :render-content="renderContent">
-    </el-tree>
-
-    <el-tree
-            :data="nodes"
-            show-checkbox
-            node-key="id"
-            default-expand-all
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag"
-            :expand-on-click-node="false"
-            :render-content="renderContent">
-    </el-tree>
-    <el-tree
-            :data="nodes"
-            show-checkbox
-            node-key="id"
-            default-expand-all
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag"
-            :expand-on-click-node="false"
-            :render-content="renderContent">
-    </el-tree>
-    <el-tree
-            :data="nodes"
-            show-checkbox
-            node-key="id"
-            default-expand-all
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag"
-            :expand-on-click-node="false"
-            :render-content="renderContent">
-    </el-tree>
-    <el-tree
-            :data="nodes"
-            show-checkbox
-            node-key="id"
-            default-expand-all
-            @node-drag-start="handleDragStart"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            draggable
-            :allow-drop="allowDrop"
-            :allow-drag="allowDrag"
-            :expand-on-click-node="false"
-            :render-content="renderContent">
-    </el-tree>
-
+    <h1>Welcome!</h1>
 
 {% endblock %}
 
 
 {% block extra_js %}
     <script>
+
+        let traverseById = (id, node, label) => {
+            console.log(node.label);
+            console.log(node);
+            let childIndex = 0;
+            // intentemaos chequiar
+            ////console.log(id === node.id);
+            if(node.id === id){
+                node.label = label;
+                return node;
+            } else {
+                if(!!node.children){
+                    node.children.forEach(node=>traverseById(id, node, label));
+                }else{
+                    return null;
+                }
+            }
+        };
         var vue = new Vue({
             el: '#app',
             delimiters: ["[[", "]]"],
             data: {
-                nodes: [{
-                    id: 1,
-                    label: 'Nomarna',
-                    children: [{
-                        id: 4,
-                        label: 'Integración conekta',
-                        children: [{
-                            id: 9,
-                            label: 'Addcard() ... lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet '
-                        }, {
-                            id: 10,
-                            label: 'Persist default payment method'
-                        }]
-                    }]
-                }, {
-                    id: 2,
-                    label: 'Share',
-                    children: [{
-                        id: 5,
-                        label: 'Multi Share'
-                    }, {
-                        id: 6,
-                        label: 'Confirm dialog'
-                    }]
-                }]
+                nodes: {% if tree %}{{ tree.nodes_to_str() | safe }}{% else %}[]{% endif %},
+                defaultProps: {
+                    children: 'children',
+                    label: 'label',
+                    time_spent: "time_spent"
+                },
+                date: null
             },
             methods: {
-                handleDragStart(node, ev) {
-                    console.log('drag start', node);
-                },
-                handleDragEnter(draggingNode, dropNode, ev) {
-                    console.log('tree drag enter: ', dropNode.label);
-                },
-                handleDragLeave(draggingNode, dropNode, ev) {
-                    console.log('tree drag leave: ', dropNode.label);
-                },
-                handleDragOver(draggingNode, dropNode, ev) {
-                    console.log('tree drag over: ', dropNode.label);
-                },
-                handleDragEnd(draggingNode, dropNode, dropType, ev) {
-                    console.log('tree drag end: ', dropNode && dropNode.label, dropType);
-                },
-                handleDrop(draggingNode, dropNode, dropType, ev) {
-                    console.log('tree drop: ', dropNode.label, dropType);
-                },
-                allowDrop(draggingNode, dropNode, type) {
-                    if (dropNode.data.label === 'Level two 3-1') {
-                        return type !== 'inner';
-                    } else {
-                        return true;
-                    }
-                },
-                allowDrag(draggingNode) {
-                    return draggingNode.data.label.indexOf('Level three 3-1-1') === -1;
-                }
+
             }
         })
+
 
     </script>
 {% endblock %}
