@@ -2,6 +2,7 @@ import datetime
 import json
 
 from starlette.applications import Starlette
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.endpoints import HTTPEndpoint
 from starlette.staticfiles import StaticFiles
@@ -12,6 +13,9 @@ from models.base import TaskTree
 templates = Jinja2Templates(directory='templates')
 
 app = Starlette(debug=True)
+import socket
+if ".local" not in socket.gethostname():
+    app.add_middleware(HTTPSRedirectMiddleware)
 app.mount('/static', StaticFiles(directory='statics'), name='static')
 
 
