@@ -15,7 +15,8 @@ templates = Jinja2Templates(directory='templates')
 app = Starlette(debug=True)
 import socket
 if ".local" not in socket.gethostname():
-    app.add_middleware(HTTPSRedirectMiddleware)
+    #app.add_middleware(HTTPSRedirectMiddleware)
+    pass
 app.mount('/static', StaticFiles(directory='statics'), name='static')
 
 
