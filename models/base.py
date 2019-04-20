@@ -25,5 +25,15 @@ class TaskNode(BaseModel):
     position = IntegerField()
 
 
+class User(BaseModel):
+    username = CharField()
+
+
+class UserSession(BaseModel):
+    sessionid = CharField(max_length=64)
+    device = CharField(max_length=120)
+
+
+
 db.connect()
 db.create_tables([TaskTree])

@@ -31,6 +31,16 @@ class Homepage(HTTPEndpoint):
         return templates.TemplateResponse('index.html', {'request': request })
 
 
+@app.route("/login")
+class Homepage(HTTPEndpoint):
+    async def get(self, request):
+        #today = datetime.date(2019, 4, 16)
+        return templates.TemplateResponse('login.html', {'request': request })
+
+    async def post(self, request):
+
+        return templates.TemplateResponse('index.html', {'request': request })
+
 
 @app.route("/diary/{date}")
 class Homepage(HTTPEndpoint):

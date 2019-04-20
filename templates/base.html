@@ -43,11 +43,9 @@
 
         <a href="/" style="color: #00a7e0">
         <div style="padding: 15px 10px 15px 15px; background-color: white; margin-bottom: -15px; cursor: pointer">
-            <b style="font-size: 20px;">
-                BurnThrough
-            </b>
+            <i class="fas fa-user-ninja" style="background-color: #d1e0f4; padding: 5px 5px 0 5px; border-radius: 5px; font-size: 25px; margin-right: 5px"></i>
+            <b style="font-size: 20px;">César HM</b>
             {# <img src="{{ url_for('static', path='img/laser.png') }}" width="40" style="margin-top: -7px"> #}
-            <img src="/static/img/laser.png" width="40" style="margin-top: -7px">
         </div>
         </a>
 
@@ -82,7 +80,7 @@
 
     <el-footer>
         <br/>
-        Footer
+        Footar
     </el-footer>
 
   </el-aside>
@@ -93,8 +91,19 @@
         {% block header %}{% endblock %}
     </el-header>
 
-    <el-main>
-        {% block content %}{% endblock %}
+    <el-main style="padding: 0;">
+
+        <div style="padding: 10px; width: 100%; min-height: calc(100% - 75px);">
+            {% block content %}{% endblock %}
+        </div>
+
+        <div style="border-top: 1px solid #00a7e0; min-width: 100%; height: 75px; text-align: center; padding-top: 10px">
+            <p class="col-sm-3 col-xs-6" style="margin-top: 20px">BurnThrough 0.0.1</p>
+            <div class="col-xs-6">
+                <img src="/static/img/laser.png" width="55">
+            </div>
+        </div>
+
     </el-main>
 
   </el-container>
