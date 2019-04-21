@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
 
     <style>
-        div {
+        div, text {
             font-family: Quicksand, Sans-Serif;
         }
 
@@ -51,7 +51,7 @@
 
         <el-menu-item-group>
             <a href="/diary/2019-04-18"><el-menu-item index="2-1">Diary</el-menu-item></a>
-            <el-menu-item index="2-2">Throughput</el-menu-item>
+            <a href="/throughput"><el-menu-item index="2-2">Throughput</el-menu-item></a>
             <el-menu-item index="2-3">Burn Down</el-menu-item>
         </el-menu-item-group>
         {#
@@ -93,7 +93,7 @@
 
     <el-main style="padding: 0;">
 
-        <div style="padding: 10px; width: 100%; min-height: calc(100% - 55px); overflow: scroll">
+        <div style="padding: 15px; width: 100%; min-height: calc(100% - 55px); overflow: scroll">
             {% block content %}{% endblock %}
             <br/>
         </div>
@@ -121,9 +121,12 @@
 <script src="//unpkg.com/vue"></script>
 <script src="//unpkg.com/element-ui"></script>
 <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+<script src="//unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/frappe-charts@1.1.0/dist/frappe-charts.min.iife.js"></script>
 
 <script>
-  ELEMENT.locale(ELEMENT.lang.en)
+  ELEMENT.locale(ELEMENT.lang.en);
 </script>
 
 {% block extra_js %}{% endblock %}

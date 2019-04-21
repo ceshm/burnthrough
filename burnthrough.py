@@ -21,7 +21,7 @@ app.mount('/static', StaticFiles(directory='statics'), name='static')
 
 
 @app.route("/")
-class Homepage(HTTPEndpoint):
+class HomepageView(HTTPEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
         return templates.TemplateResponse('index.html', {'request': request })
@@ -32,7 +32,7 @@ class Homepage(HTTPEndpoint):
 
 
 @app.route("/login")
-class Homepage(HTTPEndpoint):
+class LoginView(HTTPEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
         return templates.TemplateResponse('login.html', {'request': request })
@@ -43,7 +43,7 @@ class Homepage(HTTPEndpoint):
 
 
 @app.route("/diary/{date}")
-class Homepage(HTTPEndpoint):
+class DiaryView(HTTPEndpoint):
     async def get(self, request):
         date = datetime.date.fromisoformat(request.path_params["date"])
         #today = datetime.date(2019, 4, 16)
@@ -72,3 +72,14 @@ class Homepage(HTTPEndpoint):
         tree.save()
 
         return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date})
+
+
+@app.route("/throughput")
+class ThroughputView(HTTPEndpoint):
+    async def get(self, request):
+        #today = datetime.date(2019, 4, 16)
+        return templates.TemplateResponse('throughput.html', {'request': request })
+
+    async def post(self, request):
+
+        return templates.TemplateResponse('throughput.html', {'request': request })
