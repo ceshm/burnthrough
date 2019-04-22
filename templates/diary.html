@@ -72,10 +72,8 @@
                     @change="(event) => taskeditname(event, node)"
                     style="margin-bottom: 10px; box-shadow: none"
                 >
-                <label>Estimated Time:</label><br/>
 
-                <label style="margin-top: 8px">Time Spent:</label><br/>
-
+                <label><i class="fas fa-bolt"></i> Time Spent:</label><br/>
                 <el-time-select
                     placeholder="Start time"
                     v-model="node.data.time_spent[0]"
@@ -100,6 +98,27 @@
                     style="width: 49%"
                 >
                 </el-time-select>
+
+                <label style="margin-top: 10px"><i class="fas fa-fire"></i> Estimated Time:</label><br/>
+                <el-time-select
+                    v-model="value1"
+                    size="mini"
+                    :picker-options="{
+                    start: '00:5',
+                    step: '00:5',
+                    end: '8:00'
+                    }"
+                    style="width: 99%"
+                    placeholder="Select time"
+                >
+                </el-time-select>
+
+                <el-button
+                    size="small"
+                    type="danger"
+                    style="margin-top: 15px;"
+                    @click="() => remove(node, data)">Delete
+                </el-button>
                 </template>
 
                 <span slot="reference">
@@ -118,13 +137,20 @@
                     style="padding: 2px"
                     @click="() => append(data)">
                 </el-button>
-                <el-button
-                    size="mini"
-                    icon="el-icon-delete"
-                    circle
-                    style="padding: 2px"
-                    @click="() => remove(node, data)">
-                </el-button>
+                <el-dropdown>
+                  <el-button
+                      size="mini"
+                      icon="el-icon-d-arrow-right"
+                      circle
+                      style="padding: 2px"
+                  >
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>Move for tomorrow</el-dropdown-item>
+                    <el-dropdown-item>Copy for tomorrow</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+
             </span>
 
         </span>

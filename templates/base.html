@@ -13,12 +13,19 @@
 <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
 
     <style>
-        div, text {
+        div, text, li {
             font-family: Quicksand, Sans-Serif;
         }
 
         [v-cloak] > * {
             display: none;
+        }
+        a:hover{
+            text-decoration: none;
+        }
+        .menu-icon{
+            font-size: 18px;
+            margin: -5px 15px 0 5px;
         }
         /*
         [v-cloak]::before {
@@ -37,22 +44,22 @@
 
 <el-container style="height: 100vh; border: 1px solid #eee">
 
-  <el-aside width="200px" style="background-color: rgb(238, 241, 246);">
+  <el-aside width="200px" style="border-right: 1px solid rgb(238,241,246)">
 
-    <el-menu :default-openeds="['1', '3']">
+    <el-menu :default-openeds="['1', '3']" style="border-right: none">
 
         <a href="/" style="color: #00a7e0">
         <div style="padding: 15px 10px 15px 15px; background-color: white; margin-bottom: -15px; cursor: pointer">
             <i class="fas fa-user-ninja" style="background-color: #d1e0f4; padding: 5px 5px 0 5px; border-radius: 5px; font-size: 25px; margin-right: 5px"></i>
-            <b style="font-size: 20px;">César HM</b>
+            <b style="font-size: 19px;margin-top: -10px">César HM <i class="fas fa-angle-down"></i></b>
             {# <img src="{{ url_for('static', path='img/laser.png') }}" width="40" style="margin-top: -7px"> #}
         </div>
         </a>
 
         <el-menu-item-group>
-            <a href="/diary/2019-04-18"><el-menu-item index="2-1">Diary</el-menu-item></a>
-            <a href="/throughput"><el-menu-item index="2-2">Throughput</el-menu-item></a>
-            <el-menu-item index="2-3">Burn Down</el-menu-item>
+            <a href="/diary/2019-04-18"><el-menu-item index="2-1"><i class="fas fa-file-alt menu-icon"></i> Diary</el-menu-item></a>
+            <a href="/throughput"><el-menu-item index="2-2"><i class="fas fa-bolt menu-icon"></i> Throughput</el-menu-item> </a>
+            <el-menu-item index="2-3"><i class="fas fa-fire menu-icon"></i> Burn Down </el-menu-item>
         </el-menu-item-group>
         {#
         <el-submenu index="2-4">
