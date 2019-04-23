@@ -364,12 +364,13 @@
                     this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].name = event.target.value;
                 },
                 noteTextChanged(event, noteId){
-                    let newText = event.target.innerText;
+                    let newHTML = event.target.innerHTML;
+                    let newText = event.target.innerHTML.replace(/<br>/g,"\n");
                     console.log(newText);
                     console.log(event);
-                    event.target.innerText = "";
+                    event.target.innerHTML = "";
                     this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].text = newText;
-                    event.target.innerText = newText;
+                    event.target.innerHTML = newHTML;
                 }
             }
         })
