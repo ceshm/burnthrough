@@ -11,12 +11,12 @@
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,700" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
 
     <style>
-        div, text, li {
+        body, text, li {
             font-family: Quicksand, Sans-Serif;
         }
-
         [v-cloak] > * {
             display: none;
         }
@@ -26,6 +26,32 @@
         .menu-icon{
             font-size: 18px;
             margin: -5px 15px 0 5px;
+        }
+        input {
+            box-shadow: none !important
+        }
+
+        p[contenteditable] {
+            max-height: 200px;
+            max-width: 100%;
+            overflow: auto;
+            font-family: monospace !important;
+            white-space: pre-line;
+            //background-color: rgba(0,0,0,.2);
+            margin-bottom: 1px;
+            //padding: 10px;
+            padding-top: 5px;
+        }
+        .estimated_time{
+            background-color: #e00052;
+            color: white;
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 0px 6px;
+            margin-right: 15px;
+            width: 54px;
+            display: inline-block;
+            text-align: center;
         }
         /*
         [v-cloak]::before {
@@ -94,23 +120,96 @@
 
   <el-container>
 
-    <el-header style="text-align: right; font-size: 12px; background-color: #f8f7ff; box-shadow: 0px 1px 2px rgba(0,0,0,.1); z-index: 11">
+    <el-header style="text-align: right; font-size: 12px; background-color: #fafaff; z-index: 11; border-bottom: 1px solid rgb(238,241,246)">
         {% block header %}{% endblock %}
     </el-header>
 
-    <el-main style="padding: 0;">
+    <el-main style="padding: 0; overflow-x: hidden">
 
-        <div style="padding: 15px; width: 100%; min-height: calc(100% - 55px); overflow: scroll">
-            {% block content %}{% endblock %}
-            <br/>
-        </div>
+        <div class="container-fluid" style="height: 100%">
+            <div class="row-offcanvas active">
 
-        <div style="border-top: 1px solid #00a7e0; min-width: 100%; height: 55px; text-align: center; padding-top: 4px">
-            <p class="col-sm-3 col-xs-6" style="margin-top: 12px; color: #00a7e0; font-size: 15px">BurnThrough 0.0.1</p>
-            <div class="col-xs-6">
-                <img src="/static/img/laser.png" width="45">
-            </div>
-        </div>
+                <div class="sidebar-offcanvas sidebar">
+                    <div style="width: 100%; height: 35px">
+                        <span style="font-size: 20px; font-weight: 400">Notes</span>
+                        <span><el-button
+                                icon="el-icon-plus"
+                                circle
+                                class="pull-right"
+                                style="padding: 5px"
+                                @click="() => newNote()"
+                        >
+                        </el-button></span>
+                    </div>
+
+                    <draggable v-model="myArray" group="people" @start="drag=true" @end="drag=false" handle=".handle">
+
+                        <div v-for="element in myArray" :key="element.id">
+                            <div class="panel panel-default">
+                                <div class="panel-heading handle">
+                                    <el-popover
+                                            placement="bottom"
+                                            title=""
+                                            width="200"
+                                            trigger="click"
+                                            @show="()=>editNoteName(element.id)"
+                                    >
+                                        <input
+                                            class="form-control input-sm"
+                                            :id="element.id+'_note_name'"
+                                            :value="element.name"
+                                            @change="(event) => noteNameChanged(event, element.id)"
+                                        />
+
+                                        <span slot="reference" style="cursor: pointer">[[ element.name ]]</span>
+                                    </el-popover>
+
+                                    <span class="pull-right" style="margin-top: -5px; margin-right: -5px" >
+                                        <el-button
+                                                size="mini"
+                                                icon="el-icon-delete"
+                                                circle
+                                                style="padding: 2px"
+                                                @click="() => deleteNote(element.id)">
+                                        </el-button>
+                                    </span>
+                                </div>
+                                <div class="panel-body">
+                                     {#<textarea class="note-textarea" rows="5" v-model="element.text" >[[ element.text ]]</textarea>#}
+                                    <p contenteditable
+                                       class="note-textarea"
+                                       @focusout="event=>noteTextChanged(event, element.id)"
+                                    >[[ element.text ]]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </draggable>
+
+                </div><!-- /.cols-->
+
+                <div class="content">
+
+                    <p class="pull-right">
+                        <a type="button" class="btn btn-collapse btn-sm" data-toggle="offcanvas"><i
+                                class="glyphicon glyphicon-chevron-down"></i></a>
+                    </p>
+
+                    <div style="padding: 15px; width: 100%; min-height: calc(100% - 55px); overflow: scroll">
+                        {% block content %}{% endblock %}
+                        <br/>
+                    </div>
+
+                    <div style="border-top: 1px solid #00a7e0; min-width: 100%; height: 55px; text-align: center; padding-top: 4px">
+                        <p class="col-sm-3 col-xs-6" style="margin-top: 12px; color: #00a7e0; font-size: 15px">
+                            BurnThrough 0.0.1</p>
+                        <div class="col-xs-6">
+                            <img src="/static/img/laser.png" width="45">
+                        </div>
+                    </div>
+
+                </div><!-- /.cols-->
+            </div><!-- /.row-->
+        </div><!-- /.container -->
 
     </el-main>
 
@@ -131,9 +230,25 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
 <script src="//unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/frappe-charts@1.1.0/dist/frappe-charts.min.iife.js"></script>
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
 
 <script>
-  ELEMENT.locale(ELEMENT.lang.en);
+    ELEMENT.locale(ELEMENT.lang.en);
+
+    $(document).ready(function () {
+        let sidebarActive = localStorage.getItem('sidebarActive') === "true";
+        if (sidebarActive){
+            $('.row-offcanvas').toggleClass('active');
+        }
+        $('[data-toggle=offcanvas]').click(function () {
+            sidebarActive = localStorage.getItem('sidebarActive') === "true";
+            $('.row-offcanvas').toggleClass('active');
+            localStorage.setItem('sidebarActive', (!sidebarActive).toString());
+        });
+    });
 </script>
 
 {% block extra_js %}{% endblock %}

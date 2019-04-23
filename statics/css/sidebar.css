@@ -1,0 +1,161 @@
+/* Variables */
+/* Mixins*/
+/* Style tweaks */
+html,
+
+body {
+  overflow-x: hidden;
+  /* Prevent scroll on narrow devices */
+  height: 100%;
+    width: 100%
+}
+
+.note-textarea{
+    border: none;
+    resize: vertical;
+    padding: 15px;
+    margin-bottom: -5px;
+    font-family: monospace;
+    font-weight: 200;
+    font-size: 12px;
+
+    width: 100%;
+    //height: 100%;
+    max-height: 200px !important;
+    overflow: auto;
+}
+.note-textarea:focus {
+    outline: none !important;
+}
+
+.handle{
+    cursor: move;
+}
+.panel{
+    margin-bottom: 15px !important;
+}
+.panel-body{
+    padding: 1px
+}
+.panel-heading{
+    background-color: white !important;
+    padding-bottom: 2px;
+    border: none;
+    font-weight: 600;
+}
+
+/* Off Canvas */
+@media screen and (min-width: 768px) {
+  .row-offcanvas {
+    position: relative;
+    right: 30%;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+      height: 100%;
+  }
+  .row-offcanvas.active {
+    right: 0;
+    /* 3 columns */
+  }
+  .row-offcanvas.active .content {
+    width: 100%;
+    /* 12 columns */
+  }
+  .row-offcanvas .content {
+    width: 70%;
+    /* 9 columns */
+    float: right;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+  }
+  .row-offcanvas .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 30%;
+    /* 3 columns */
+    right: -30%;
+    /* 3 columns */
+  }
+}
+
+.container-fluid{
+    padding:0;
+}
+
+@media screen and (max-width: 767px) {
+  .row-offcanvas {
+    right: 0;
+    position: relative;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+      height: 100%;
+  }
+  .row-offcanvas.active {
+    right: 50%;
+    /* 6 columns */
+  }
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    /* 6 columns */
+    right: -50%;
+    /* 6 columns */
+  }
+}
+/* styling the sidebar and the toggle button */
+.content {
+  position: relative;
+    height: 100%;
+}
+
+.sidebar {
+    background: rgba(252, 254, 255, 1);
+    padding: 10px 15px;
+ // margin-top: -20px;
+    //border-radius: 0 0 0 5px;
+    overflow: scroll;
+    height: 100%;
+    z-index: 4;
+    border-left: 1px solid rgb(238,241,246);
+}
+
+.btn-collapse {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 5px 5px 0 0;
+  bottom: 10px;
+  right: 0;
+    z-index: 1;
+  margin-right: -1px;
+  background: white;
+    box-shadow: 0 -1px 3px rgba(0,0,0,.2);
+  transform: rotate(-90deg);
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -ms-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}
+
+.row-offcanvas.active .btn-collapse {
+  right: 0;
+  margin-right: -8px;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -ms-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}
+.row-offcanvas.active .btn-collapse i {
+  transform: rotate(180deg);
+}

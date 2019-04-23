@@ -1,6 +1,6 @@
 import json
 
-from peewee import Model, CharField, PostgresqlDatabase, TextField, IntegerField, DateField
+from peewee import Model, CharField, PostgresqlDatabase, TextField, IntegerField, DateField, ForeignKeyField
 from playhouse.postgres_ext import JSONField
 
 db = PostgresqlDatabase('burnthrough', user="cesar", password="cesar2019", host="127.0.0.1", port=5432)
@@ -10,8 +10,20 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+class User(BaseModel):
+    username = CharField(max_length=255)
+    password = CharField(null=True)
+    data = JSONField()
 
-class TaskTree(BaseModel):
+
+class UserSession(BaseModel):
+    user = ForeignKeyField(User)
+    sessionid = CharField(max_length=64)
+    device = CharField(max_length=120)
+
+
+class UserTaskTree(BaseModel):
+    user = ForeignKeyField(User)
     name = CharField()
     date = DateField()
     nodes = JSONField()
@@ -20,20 +32,13 @@ class TaskTree(BaseModel):
         return json.dumps(self.nodes)
 
 
-class TaskNode(BaseModel):
-    text = TextField()
-    position = IntegerField()
+class UserNotes(BaseModel):
+    user = ForeignKeyField(User)
+    notes = JSONField()
 
-
-class User(BaseModel):
-    username = CharField()
-
-
-class UserSession(BaseModel):
-    sessionid = CharField(max_length=64)
-    device = CharField(max_length=120)
-
+    def notes_to_str(self):
+        return json.dumps(self.notes)
 
 
 db.connect()
-db.create_tables([TaskTree])
+db.create_tables([User, UserNotes, UserTaskTree])

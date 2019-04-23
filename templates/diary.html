@@ -63,17 +63,21 @@
                 width="350"
                 trigger="click"
                 content="this is content, this is content, this is content"
+                @show="()=>taskPopped(node.key)"
+                @after-leave="()=>afterLeave(node.key)"
             >
                 <label>Name:</label><br/>
                 <input
                     class="form-control input-sm"
                     :data="node"
                     :value="node.label"
+                    :id="node.key+'_name'"
+                    type="text"
                     @change="(event) => taskeditname(event, node)"
                     style="margin-bottom: 10px; box-shadow: none"
                 >
 
-                <label><i class="fas fa-bolt"></i> Time Spent:</label><br/>
+                <label>Time Spent:</label><br/>
                 <el-time-select
                     placeholder="Start time"
                     v-model="node.data.time_spent[0]"
@@ -99,9 +103,9 @@
                 >
                 </el-time-select>
 
-                <label style="margin-top: 10px"><i class="fas fa-fire"></i> Estimated Time:</label><br/>
+                <label style="margin-top: 10px">Estimated Time:</label><br/>
                 <el-time-select
-                    v-model="value1"
+                    v-model="node.data.estimated_time"
                     size="mini"
                     :picker-options="{
                     start: '00:5',
@@ -113,23 +117,18 @@
                 >
                 </el-time-select>
 
-                <el-button
-                    size="small"
-                    type="danger"
-                    style="margin-top: 15px;"
-                    @click="() => remove(node, data)">Delete
-                </el-button>
                 </template>
 
-                <span slot="reference">
+                <span slot="reference" :id="node.key+'_poplabel'">
                     [[ node.label ]]
                     <b>[[ node.data.time_spent[0] ]] <span v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</b>
                 </span>
-
             </el-popover>
             </span>
 
             <span class="pull-right">
+                <span v-if="!!node.data.estimated_time" class="estimated_time">[[ node.data.estimated_time ]] <i class="fas fa-fire" style="font-size: 11px;"></i></span>
+
                 <el-button
                     size="mini"
                     icon="el-icon-plus"
@@ -137,7 +136,7 @@
                     style="padding: 2px"
                     @click="() => append(data)">
                 </el-button>
-                <el-dropdown>
+                <el-dropdown @command="cmd=>handleTransferCommand(cmd,node)">
                   <el-button
                       size="mini"
                       icon="el-icon-d-arrow-right"
@@ -146,18 +145,54 @@
                   >
                   </el-button>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>Move for tomorrow</el-dropdown-item>
-                    <el-dropdown-item>Copy for tomorrow</el-dropdown-item>
+                    <el-dropdown-item command="mov">Move for tomorrow</el-dropdown-item>
+                    <el-dropdown-item command="cop">Copy for tomorrow</el-dropdown-item>
+                    <el-dropdown-item command="mcsd">To specific date...</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
 
+                <el-button
+                    size="mini"
+                    icon="el-icon-delete"
+                    circle
+                    style="padding: 2px; margin-left: 15px"
+                    @click="() => remove(node, data)">
+                </el-button>
+
             </span>
+
 
         </span>
     </el-tree>
 
+    <el-dialog
+        title="Move/copy task"
+        :visible.sync="dialogVisible"
+        width="30%"
+    >
+        <p>Task: [[ transferTask.label ]]</p>
+
+        <el-select v-model="transferType" placeholder="Select">
+            <el-option key="1" label="Copy" value="1">Copy</el-option>
+            <el-option key="2" label="Move" value="2">Move</el-option>
+        </el-select>
+        <br/>
+        <br/>
+        <el-date-picker
+            v-model="transferDate"
+            type="date"
+            placeholder="Select Date"
+        >
+        </el-date-picker>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">Cancel</el-button>
+            <el-button type="primary" @click="()=> { dialogVisible = false; transferConfirm() }">Confirm</el-button>
+        </span>
+    </el-dialog>
+
     <form method="post" ref="form">
      <input type="hidden" name="nodes" id="nodes">
+     <input type="hidden" name="notes" id="notes">
     </form>
 
 {% endblock %}
@@ -193,13 +228,18 @@
                     label: 'label',
                     time_spent: "time_spent"
                 },
-                date: null
+                dialogVisible: false,
+                date: null,
+                transferDate: null,
+                transferType: "1",
+                transferTask: { label: "Na" },
+                myArray: {% if notes %}{{ notes.notes_to_str() | safe }}{% else %}[]{% endif %}
             },
             methods: {
                 save(){
                     console.log("Saving shit");
                     $("#nodes").val(JSON.stringify(this.$data.nodes));
-                    console.log(JSON.stringify(this.$data.nodes));
+                    $("#notes").val(JSON.stringify(this.$data.myArray));
                     this.$refs.form.submit();
                 },
                 nodecontext(event, node){
@@ -208,12 +248,14 @@
                 },
                 taskeditname(event, node){
                     console.log(node);
-                    traverseById(node.key, {id: -1, children: this.$data.nodes, label: "root"}, event.target.value);
+                    if(event.target.value!=="")
+                        traverseById(node.key, {id: -1, children: this.$data.nodes, label: "root"}, event.target.value);
                 },
                 append(data) {
+                    let nodeId = Math.random().toString(36).substr(2, 9);
                     if (!!data) {
                         const newChild = {
-                            id: Math.random().toString(36).substr(2, 9),
+                            id: nodeId,
                             label: 'task',
                             time_spent: [null, null],
                             children: []
@@ -224,18 +266,53 @@
                         data.children.push(newChild);
                     }else{
                         this.$data.nodes.push({
-                            id: Math.random().toString(36).substr(2, 9),
+                            id: nodeId,
                             label: 'task',
+                            //estimated_time: null,
                             time_spent: [null, null],
                             children: []
                         });
                     }
+                    setTimeout(()=>{
+                        let label = document.getElementById(nodeId+"_poplabel");
+                        console.log(label);
+                        label.click();
+                    },50);
                 },
                 remove(node, data) {
                     const parent = node.parent;
                     const children = parent.data.children || parent.data;
                     const index = children.findIndex(d => d.id === data.id);
                     children.splice(index, 1);
+                },
+                taskPopped(nameInputId){
+                    let input = document.getElementById(nameInputId+"_name");
+                    setTimeout(() => {input.focus();input.select();}, 50);
+                },
+                afterLeave(nodeId){
+                    console.log("After leave");
+                    /*
+                    let taskName = $("#"+nodeId+"_name").val();
+                    console.log(taskName);
+                    if(taskName === ""){
+                        traverseById(nodeId, {id: -1, children: this.$data.nodes, label: "root"}, "--");
+                    }
+                    */
+                },
+                transferConfirm(smh){
+                    console.log("transfer confirm");
+                    console.log(smh);
+                    console.log(this.$data.transferDate);
+                    console.log(this.$data.transferType);
+                    console.log(this.$data.transferTask);
+                },
+                handleTransferCommand(command, node){
+                    console.log(command);
+                    console.log(node);
+                    if(command==="mcsd"){
+                        this.$data.transferTask = node;
+                        this.$data.dialogVisible = true;
+                    }
                 },
                 handleDragStart(node, ev) {
                     console.log('drag start', node);
@@ -269,6 +346,30 @@
                     console.log(date.getFullYear(), date.getMonth()+1, date.getDate());
                     window.location = "/diary/"+date.getFullYear()+"-"+(date.getMonth()+1).toString().padStart(2,'0')+"-"+date.getDate().toString().padStart(2,'0');
 
+                },
+                newNote(){
+                    this.$data.myArray.unshift({ id: Math.random().toString(36).substr(2, 9), name: "new note", text: "" })
+                },
+                deleteNote(noteId){
+                    console.log("Deleting: ");
+                    let removeIndex = this.$data.myArray.map((item) => item.id).indexOf(noteId);
+                    this.$data.myArray.splice(removeIndex, 1);
+                },
+                editNoteName(noteId){
+                    let input = document.getElementById(noteId+"_note_name");
+                    setTimeout(() => {input.focus();input.select();}, 50);
+                },
+                noteNameChanged(event, noteId){
+                    console.log(event.target.value);
+                    this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].name = event.target.value;
+                },
+                noteTextChanged(event, noteId){
+                    let newText = event.target.innerText;
+                    console.log(newText);
+                    console.log(event);
+                    event.target.innerText = "";
+                    this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].text = newText;
+                    event.target.innerText = newText;
                 }
             }
         })
