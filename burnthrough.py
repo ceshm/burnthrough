@@ -55,6 +55,8 @@ class DiaryView(HTTPEndpoint):
         except UserTaskTree.DoesNotExist:
             print("tree does not exist...")
             tree = None
+        except:
+            tree = None
 
         try:
             notes = UserNotes.get(UserNotes.user == 2)
