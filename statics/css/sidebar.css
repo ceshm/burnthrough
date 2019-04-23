@@ -15,9 +15,9 @@ body {
     resize: vertical;
     padding: 15px;
     margin-bottom: -5px;
-    font-family: 'Caveat', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    font-family: Helvetica, Arial, sans-serif;
     font-weight: 200;
-    font-size: 16px;
+    font-size: 12px;
 
     width: 100%;
     //height: 100%;
