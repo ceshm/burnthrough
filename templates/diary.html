@@ -120,7 +120,7 @@
                 </template>
 
                 <span slot="reference" :id="node.key+'_poplabel'">
-                    [[ node.label ]]
+                    <span class="node-text">[[ node.label ]]</span>
                     <b>[[ node.data.time_spent[0] ]] <span v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</b>
                 </span>
             </el-popover>
