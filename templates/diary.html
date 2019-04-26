@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block header %}
-    <el-button class="pull-left" type="primary" style="margin-top: 10px" v-on:click="save">Save</el-button>
+    <el-button class="pull-left" type="primary" style="margin-top: 10px" :disabled="!saveEnabled" v-on:click="save">Save</el-button>
 
     <el-date-picker
         v-model="date"
@@ -40,18 +40,20 @@
     <el-tree
         :data="nodes"
         node-key="id"
-        default-expand-all
         @node-drag-start="handleDragStart"
         @node-drag-enter="handleDragEnter"
         @node-drag-leave="handleDragLeave"
         @node-drag-over="handleDragOver"
         @node-drag-end="handleDragEnd"
         @node-drop="handleDrop"
+        @node-expand="nodeExpanded"
+        @node-collapse="nodeCollapsed"
+        :default-expanded-keys="expandedNodes"
         draggable
         :allow-drop="allowDrop"
         :allow-drag="allowDrag"
         :expand-on-click-node="false"
-        :render-content="renderContent"
+        {#  :render-content="renderContent"#}
         style="height: 45px; padding-top: 10px"
         {# @node-contextmenu="nodecontext"#}
     >
@@ -161,7 +163,6 @@
 
             </span>
 
-
         </span>
     </el-tree>
 
@@ -193,6 +194,7 @@
     <form method="post" ref="form">
      <input type="hidden" name="nodes" id="nodes">
      <input type="hidden" name="notes" id="notes">
+     <input type="hidden" name="expanded_nodes" id="expanded_nodes">
     </form>
 
 {% endblock %}
@@ -229,17 +231,20 @@
                     time_spent: "time_spent"
                 },
                 dialogVisible: false,
+                saveEnabled: false,
                 date: null,
                 transferDate: null,
                 transferType: "1",
                 transferTask: { label: "Na" },
-                myArray: {% if notes %}{{ notes.notes_to_str() | safe }}{% else %}[]{% endif %}
+                myArray: {% if notes %}{{ notes.notes_to_str() | safe }}{% else %}[]{% endif %},
+                expandedNodes: {% if tree %}{{ tree.expanded_nodes_to_str() | safe }}{% else %}[]{% endif %}
             },
             methods: {
                 save(){
                     console.log("Saving shit");
                     $("#nodes").val(JSON.stringify(this.$data.nodes));
                     $("#notes").val(JSON.stringify(this.$data.myArray));
+                    $("#expanded_nodes").val(JSON.stringify(this.$data.expandedNodes));
                     this.$refs.form.submit();
                 },
                 nodecontext(event, node){
@@ -247,11 +252,13 @@
                     console.log(node);
                 },
                 taskeditname(event, node){
+                    this.$data.saveEnabled = true;
                     console.log(node);
                     if(event.target.value!=="")
                         traverseById(node.key, {id: -1, children: this.$data.nodes, label: "root"}, event.target.value);
                 },
                 append(data) {
+                    this.$data.saveEnabled = true;
                     let nodeId = Math.random().toString(36).substr(2, 9);
                     if (!!data) {
                         const newChild = {
@@ -280,6 +287,7 @@
                     },50);
                 },
                 remove(node, data) {
+                    this.$data.saveEnabled = true;
                     const parent = node.parent;
                     const children = parent.data.children || parent.data;
                     const index = children.findIndex(d => d.id === data.id);
@@ -330,6 +338,7 @@
                     console.log('tree drag end: ', dropNode && dropNode.label, dropType);
                 },
                 handleDrop(draggingNode, dropNode, dropType, ev) {
+                    this.$data.saveEnabled = true;
                     console.log('tree drop: ', dropNode.label, dropType);
                 },
                 allowDrop(draggingNode, dropNode, type) {
@@ -345,25 +354,28 @@
                 dateChange(date){
                     console.log(date.getFullYear(), date.getMonth()+1, date.getDate());
                     window.location = "/diary/"+date.getFullYear()+"-"+(date.getMonth()+1).toString().padStart(2,'0')+"-"+date.getDate().toString().padStart(2,'0');
-
                 },
                 newNote(){
+                    this.$data.saveEnabled = true;
                     this.$data.myArray.unshift({ id: Math.random().toString(36).substr(2, 9), name: "new note", text: "" })
                 },
                 deleteNote(noteId){
-                    console.log("Deleting: ");
+                    this.$data.saveEnabled = true;
                     let removeIndex = this.$data.myArray.map((item) => item.id).indexOf(noteId);
                     this.$data.myArray.splice(removeIndex, 1);
                 },
                 editNoteName(noteId){
+                    this.$data.saveEnabled = true;
                     let input = document.getElementById(noteId+"_note_name");
                     setTimeout(() => {input.focus();input.select();}, 50);
                 },
                 noteNameChanged(event, noteId){
+                    this.$data.saveEnabled = true;
                     console.log(event.target.value);
                     this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].name = event.target.value;
                 },
                 noteTextChanged(event, noteId){
+                    this.$data.saveEnabled = true;
                     let newHTML = event.target.innerHTML;
                     let newText = event.target.innerHTML.replace(/<br>/g,"\n");
                     console.log(newText);
@@ -371,6 +383,15 @@
                     event.target.innerHTML = "";
                     this.$data.myArray[this.$data.myArray.map((item) => item.id).indexOf(noteId)].text = newText;
                     event.target.innerHTML = newHTML;
+                },
+                nodeExpanded(node){
+                    this.$data.expandedNodes.push(node.id);
+                    this.$data.saveEnabled = true;
+                },
+                nodeCollapsed(node){
+                    var index = this.$data.expandedNodes.indexOf(node.id);
+                    if (index !== -1) this.$data.expandedNodes.splice(index, 1);
+                    this.$data.saveEnabled = true;
                 }
             }
         })

@@ -8,7 +8,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from models.base import UserNotes, UserTaskTree
+from models.base import UserNotes, UserTaskTree, UserExpandedNodes
 
 templates = Jinja2Templates(directory='templates')
 
@@ -79,11 +79,11 @@ class DiaryView(HTTPEndpoint):
             tree.date = date
             tree.name = "awdawd"
         tree.nodes = json_nodes
+        if "expanded_nodes" in form:
+            tree.expanded_nodes = json.loads(form["expanded_nodes"])
         tree.save()
 
         json_notes = json.loads(form["notes"])
-        print(form["notes"])
-
         try:
             notes = UserNotes.get(UserNotes.user == 2)
             print("Notes found!")
@@ -94,7 +94,8 @@ class DiaryView(HTTPEndpoint):
         notes.notes = json_notes
         notes.save()
 
-        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes})
+
+        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes })
 
 
 @app.route("/throughput")

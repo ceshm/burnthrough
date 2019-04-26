@@ -27,9 +27,13 @@ class UserTaskTree(BaseModel):
     name = CharField()
     date = DateField()
     nodes = JSONField()
+    expanded_nodes = JSONField(default=[])
 
     def nodes_to_str(self):
         return json.dumps(self.nodes)
+
+    def expanded_nodes_to_str(self):
+        return json.dumps(self.expanded_nodes)
 
 
 class UserNotes(BaseModel):
@@ -40,5 +44,15 @@ class UserNotes(BaseModel):
         return json.dumps(self.notes)
 
 
+# Obsolete
+class UserExpandedNodes(BaseModel):
+    user = ForeignKeyField(User)
+    data = JSONField()
+
+    def data_to_str(self):
+        return json.dumps(self.data)
+
+
 db.connect()
-db.create_tables([User, UserNotes, UserTaskTree])
+#db.create_tables([User, UserNotes, UserTaskTree])
+#db.create_tables([UserExpandedNodes])
