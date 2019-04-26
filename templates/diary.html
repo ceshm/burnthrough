@@ -262,7 +262,7 @@
                     let nodeId = Math.random().toString(36).substr(2, 9);
                     console.log("datatata");
 
-                    if (this.$data.expandedNodes.indexOf(data.id) === -1)
+                    if (!!data && this.$data.expandedNodes.indexOf(data.id) === -1)
                         this.$data.expandedNodes.push(data.id);
 
                     console.log(data);
