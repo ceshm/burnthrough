@@ -17,6 +17,7 @@
 {% block header %}
     <el-button class="pull-left" type="primary" style="margin-top: 10px" :disabled="!saveEnabled" v-on:click="save">Save</el-button>
 
+    <a href="/diary/{{ prev_date.year }}-{{ '%02d' % prev_date.month }}-{{ '%02d' % prev_date.day }}"><el-button type="default" icon="el-icon-arrow-left" style="padding-right: 10px; padding-left: 10px"></el-button></a>
     <el-date-picker
         v-model="date"
         type="date"
@@ -24,6 +25,7 @@
         @change="dateChange"
     >
     </el-date-picker>
+    <a href="/diary/{{ next_date.year }}-{{ '%02d' % next_date.month }}-{{ '%02d' % next_date.day }}"><el-button type="default" icon="el-icon-arrow-right" style="padding-right: 10px; padding-left: 10px"></el-button></a>
 {% endblock %}
 
 {% block content %}
@@ -124,6 +126,7 @@
                 <span slot="reference" :id="node.key+'_poplabel'">
                     <span class="node-text">[[ node.label ]]</span>
                     <span v-if="!!node.data.time_spent[0]" class="time_spent">[[ node.data.time_spent[0] ]] <span v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</span>
+                    <span v-if="!!node.data._estimated_time && node.data._estimated_time!='00:00'" class="_estimated_time">@[[ node.data._estimated_time ]] </span>
                 </span>
             </el-popover>
             </span>
@@ -233,7 +236,7 @@
                 },
                 dialogVisible: false,
                 saveEnabled: false,
-                date: null,
+                date: new Date({{ date.year }},{{ date.month - 1 }},{{ date.day }}),
                 transferDate: null,
                 transferType: "1",
                 transferTask: { label: "Na" },
