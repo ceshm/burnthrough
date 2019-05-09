@@ -7,7 +7,7 @@ from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from models.base import UserNotes, UserTaskTree
+from models.base import UserNotes, UserTaskTree, UserDailyData
 from tree_stuff import traverse_json_tree, traverse_json_tree_list
 
 templates = Jinja2Templates(directory='templates')
@@ -61,18 +61,19 @@ class DiaryView(HTTPEndpoint):
         try:
             tree = UserTaskTree.get(UserTaskTree.date == date)
             traverse_json_tree_list(tree.nodes)
-            #print("Tree found!")
         except UserTaskTree.DoesNotExist:
-            #print("tree does not exist...")
             tree = None
         try:
             notes = UserNotes.get(UserNotes.user == 2)
-            #print("Notes found!")
         except UserNotes.DoesNotExist:
-            #print("Notes not exist...")
             notes = None
 
-        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date})
+        try:
+            daily_data = UserDailyData.get(UserDailyData.user == 2, UserDailyData.date == date)
+        except UserDailyData.DoesNotExist:
+            daily_data = None
+
+        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date, "daily_data": daily_data})
 
     async def post(self, request):
         date = datetime.date.fromisoformat(request.path_params["date"])
@@ -106,7 +107,23 @@ class DiaryView(HTTPEndpoint):
         notes.notes = json_notes
         notes.save()
 
-        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date })
+        try:
+            daily_data = UserDailyData.get(UserDailyData.user == 2, UserDailyData.date == date)
+            # print("Notes found!")
+        except UserDailyData.DoesNotExist:
+            daily_data = None
+        if "levels" in form and form["levels"]!="":
+            json_levels = json.loads(form["levels"])
+            if not daily_data:
+                # print("Notes not exist...")
+                daily_data = UserDailyData()
+                daily_data.user = 2
+                daily_data.date = date
+                daily_data.data = {}
+            daily_data.data["levels"] = json_levels
+            daily_data.save()
+
+        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date, "daily_data": daily_data })
 
 
 @app.route("/throughput")

@@ -44,6 +44,32 @@ class UserNotes(BaseModel):
         return json.dumps(self.notes)
 
 
+class UserDailyData(BaseModel):
+    user = ForeignKeyField(User)
+    date = DateField()
+    data = JSONField()
+    """
+    data = {
+        "levels": {
+            "sleep": 8.5,
+            "caffeine": 2,
+            "zen(calmness)": 5,
+        },
+        "annotations": { ... }
+    }
+    """
+
+    def data_to_str(self):
+        return json.dumps(self.data)
+
+    @property
+    def levels(self):
+        if self.data and "levels" in self.data:
+            return self.data["levels"]
+        else:
+            return None
+
+
 # Obsolete
 class UserExpandedNodes(BaseModel):
     user = ForeignKeyField(User)
@@ -56,3 +82,4 @@ class UserExpandedNodes(BaseModel):
 db.connect()
 #db.create_tables([User, UserNotes, UserTaskTree])
 #db.create_tables([UserExpandedNodes])
+db.create_tables([UserDailyData])
