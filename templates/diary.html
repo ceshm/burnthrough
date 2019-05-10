@@ -50,7 +50,7 @@
     <el-button
         icon="el-icon-s-operation"
         class="pull-left"
-        style="padding: 9px 12px; margin-right: 10px;"
+        style="padding: 8px 12px; margin-right: 10px;"
         {% if daily_data and daily_data.levels %}type="primary" plain{% endif %}
         @click="makeLevelsDialogVisible">
     </el-button>
@@ -176,8 +176,8 @@
                   >
                   </el-button>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="mov">Move for tomorrow</el-dropdown-item>
-                    <el-dropdown-item command="cop">Copy for tomorrow</el-dropdown-item>
+                    <el-dropdown-item command="mv">Move for tomorrow</el-dropdown-item>
+                    <el-dropdown-item command="cp">Copy for tomorrow</el-dropdown-item>
                     <el-dropdown-item command="mcsd">To specific date...</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -187,7 +187,7 @@
                     icon="el-icon-delete"
                     circle
                     style="padding: 2px; margin-left: 15px"
-                    @click="() => remove(node, data)">
+                    @click="() => remove(node)">
                 </el-button>
 
             </span>
@@ -196,15 +196,16 @@
     </el-tree>
 
     <el-dialog
-        title="Move/copy task"
+        title="Transfer task"
         :visible.sync="dialogVisible"
-        width="30%"
+        width="320px"
+        style="text-align: center"
     >
-        <p>Task: [[ transferTask.label ]]</p>
+        <p>"[[ transferTask.label ]]"</p>
 
         <el-select v-model="transferType" placeholder="Select">
-            <el-option key="1" label="Copy" value="1">Copy</el-option>
-            <el-option key="2" label="Move" value="2">Move</el-option>
+            <el-option key="1" label="Move" value="mv">Move</el-option>
+            <el-option key="2" label="Copy" value="cp">Copy</el-option>
         </el-select>
         <br/>
         <br/>
@@ -269,6 +270,7 @@
      <input type="hidden" name="notes" id="notes">
      <input type="hidden" name="expanded_nodes" id="expanded_nodes">
      <input type="hidden" name="levels" id="levels">
+     <input type="hidden" name="transfer" id="transfer">
     </form>
 
 
@@ -310,7 +312,7 @@
                 saveEnabled: false,
                 date: new Date({{ date.year }},{{ date.month - 1 }},{{ date.day }}),
                 transferDate: null,
-                transferType: "1",
+                transferType: "mv",
                 transferTask: { label: "Na" },
                 myArray: {% if notes %}{{ notes.notes_to_str() | safe }}{% else %}[]{% endif %},
                 expandedNodes: {% if tree %}{{ tree.expanded_nodes_to_str() | safe }}{% else %}[]{% endif %},
@@ -383,11 +385,11 @@
                         label.click();
                     },50);
                 },
-                remove(node, data) {
+                remove(node) {
                     this.$data.saveEnabled = true;
                     const parent = node.parent;
                     const children = parent.data.children || parent.data;
-                    const index = children.findIndex(d => d.id === data.id);
+                    const index = children.findIndex(d => d.id === node.data.id);
                     children.splice(index, 1);
                 },
                 taskPopped(nameInputId){
@@ -404,19 +406,37 @@
                     }
                     */
                 },
-                transferConfirm(smh){
-                    console.log("transfer confirm");
-                    console.log(smh);
-                    console.log(this.$data.transferDate);
+                transferConfirm(){
                     console.log(this.$data.transferType);
-                    console.log(this.$data.transferTask);
+                    if (this.$data.transferType==="mv"){
+                        this.remove(this.$data.transferTask);
+                    }
+                    $("#nodes").val(JSON.stringify(this.$data.nodes));
+                    $("#notes").val(JSON.stringify(this.$data.myArray));
+                    $("#expanded_nodes").val(JSON.stringify(this.$data.expandedNodes));
+                    $("#transfer").val(JSON.stringify({
+                        "node_id": this.$data.transferTask.key,
+                        "date": this.$data.transferDate.toISOString().split("T")[0]
+                    }));
+                    this.$refs.form.submit();
                 },
                 handleTransferCommand(command, node){
-                    console.log(command);
-                    console.log(node);
                     if(command==="mcsd"){
                         this.$data.transferTask = node;
                         this.$data.dialogVisible = true;
+                    }else{
+                        console.log(command);
+                        if (command === "mv") {
+                            this.remove(node);
+                        }
+                        $("#nodes").val(JSON.stringify(this.$data.nodes));
+                        $("#notes").val(JSON.stringify(this.$data.myArray));
+                        $("#expanded_nodes").val(JSON.stringify(this.$data.expandedNodes));
+                        $("#transfer").val(JSON.stringify({
+                            "node_id": node.key,
+                            "date": null
+                        }));
+                        this.$refs.form.submit();
                     }
                 },
                 handleDragStart(node, ev) {

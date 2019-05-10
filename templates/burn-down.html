@@ -59,6 +59,15 @@
 
 {% block content %}
 
+    {% for project in projects %}
+        {{ project["name"] }}: {{ project["total"] }}, starts: {{ project["starts"] }}
+    {% endfor %}
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
     <div class="indicator primary">
         <p class="indicator-label">Progr Avg</p>
         23

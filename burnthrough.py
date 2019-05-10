@@ -1,5 +1,8 @@
 import datetime
 import json
+import random
+import string
+from functools import reduce
 
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
@@ -8,7 +11,8 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 from models.base import UserNotes, UserTaskTree, UserDailyData
-from tree_stuff import traverse_json_tree, traverse_json_tree_list
+from throughput import get_burndown_data
+from tree_stuff import traverse_json_tree_list
 
 templates = Jinja2Templates(directory='templates')
 
@@ -27,7 +31,6 @@ class HomepageView(HTTPEndpoint):
         return templates.TemplateResponse('index.html', {'request': request })
 
     async def post(self, request):
-
         return templates.TemplateResponse('index.html', {'request': request })
 
 
@@ -38,16 +41,15 @@ class LoginView(HTTPEndpoint):
         return templates.TemplateResponse('login.html', {'request': request })
 
     async def post(self, request):
-
         return templates.TemplateResponse('index.html', {'request': request })
 
 
 @app.route("/diary")
 class DiaryView(HTTPEndpoint):
-
     async def get(self, request):
         today = datetime.datetime.now()
         return RedirectResponse(url="/diary/{0:02d}-{1:02d}-{2:02d}".format(today.year,today.month,today.day))
+
 
 @app.route("/diary/{date}")
 class DiaryView(HTTPEndpoint):
@@ -82,6 +84,16 @@ class DiaryView(HTTPEndpoint):
         form = await request.form()
 
         json_nodes = json.loads(form["nodes"])
+        pre_actions = []
+        if "transfer" in form and form["transfer"]!="":
+            json_transfer = json.loads(form["transfer"])
+            def transfer(node, path):
+                selected_node = None
+                if json_transfer["node_id"] == node["id"]:
+                    selected_node = ( node, path )
+                return selected_node
+            pre_actions.append(transfer)
+
         try:
             tree = UserTaskTree.get(UserTaskTree.date == date)
         except UserTaskTree.DoesNotExist:
@@ -90,8 +102,47 @@ class DiaryView(HTTPEndpoint):
             tree.user = 2
             tree.date = date
             tree.name = "awdawd"
+
+        pre_results = traverse_json_tree_list(tree.nodes, actions=pre_actions)
+        for result in pre_results:
+            print(result)
+            if result["key"] == "transfer":
+                transfer_result = result["value"]
+                print(transfer_result[0])
+                print(transfer_result[1])
+
+                path_list = transfer_result[1].split("/")[1:-1]
+                path_list.append(transfer_result[0])
+
+                transfer_tree = reduce(lambda x, y: {
+                    "id": ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(9)),
+                    "label": y,
+                    "time_spent": [None, None],
+                    "children": [x]
+                }, reversed(path_list))
+
+                if json_transfer["date"]:
+                    to_tree_date = datetime.date.fromisoformat(json_transfer["date"])
+                else:
+                    to_tree_date = date + datetime.timedelta(days=1)
+                try:
+                    to_tree = UserTaskTree.get(UserTaskTree.date == to_tree_date)
+                except UserTaskTree.DoesNotExist:
+                    to_tree = UserTaskTree()
+                    to_tree.user = 2
+                    to_tree.name = "awdawd"
+                    to_tree.date = to_tree_date
+                if to_tree:
+                    if to_tree.nodes:
+                        to_tree.nodes.append(transfer_tree)
+                    else:
+                        to_tree.nodes = [transfer_tree]
+                    to_tree.save()
+
+            # ==== Node UPDATE ====
         tree.nodes = json_nodes
-        traverse_json_tree_list(tree.nodes)
+        post_results = traverse_json_tree_list(tree.nodes, actions=())
+
         if "expanded_nodes" in form:
             tree.expanded_nodes = json.loads(form["expanded_nodes"])
         tree.save()
@@ -140,8 +191,9 @@ class ThroughputView(HTTPEndpoint):
 @app.route("/burn-down")
 class ThroughputView(HTTPEndpoint):
     async def get(self, request):
-        #today = datetime.date(2019, 4, 16)
-        return templates.TemplateResponse('burn-down.html', {'request': request })
+        projects = get_burndown_data(2)
+
+        return templates.TemplateResponse('burn-down.html', {'request': request, "projects": projects })
 
     async def post(self, request):
 
