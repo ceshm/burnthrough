@@ -38,6 +38,7 @@ class HomepageView(HTTPEndpoint):
 class LoginView(HTTPEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
+
         return templates.TemplateResponse('login.html', {'request': request })
 
     async def post(self, request):
@@ -52,7 +53,7 @@ class DiaryView(HTTPEndpoint):
 
 
 @app.route("/diary/{date}")
-class DiaryView(HTTPEndpoint):
+class DiarySpecificView(HTTPEndpoint):
 
     async def get(self, request):
         date = datetime.date.fromisoformat(request.path_params["date"])
@@ -102,8 +103,13 @@ class DiaryView(HTTPEndpoint):
             tree.user = 2
             tree.date = date
             tree.name = "awdawd"
-
-        pre_results = traverse_json_tree_list(tree.nodes, actions=pre_actions)
+        if tree.nodes:
+            try:
+                pre_results = traverse_json_tree_list(tree.nodes, actions=pre_actions)
+            except:
+                pass
+        else:
+            pre_results = []
         for result in pre_results:
             print(result)
             if result["key"] == "transfer":
@@ -189,11 +195,11 @@ class ThroughputView(HTTPEndpoint):
 
 
 @app.route("/burn-down")
-class ThroughputView(HTTPEndpoint):
+class BurnDownView(HTTPEndpoint):
     async def get(self, request):
-        projects = get_burndown_data(2)
+        daily_tp, ptp_ratio, projects = get_burndown_data(2)
 
-        return templates.TemplateResponse('burn-down.html', {'request': request, "projects": projects })
+        return templates.TemplateResponse('burn-down.html', {'request': request, "projects": projects, "daily_tp": daily_tp, "ptp_ratio": ptp_ratio })
 
     async def post(self, request):
 

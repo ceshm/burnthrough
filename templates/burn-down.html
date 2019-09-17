@@ -60,28 +60,24 @@
 {% block content %}
 
     {% for project in projects %}
-        {{ project["name"] }}: {{ project["total"] }}, starts: {{ project["starts"] }}
+        {{ project["name"] }}: {{ project["total"] }}, starts: {{ project["starts"] }} <br/>
     {% endfor %}
 
     <br/>
-    <br/>
-    <br/>
-    <br/>
 
     <div class="indicator primary">
-        <p class="indicator-label">Progr Avg</p>
-        23
+        <p class="indicator-label">Daily TP</p>
+        {{ daily_tp }}
     </div>
 
     <div class="indicator secondary">
-        <p class="indicator-label">Misc Avg</p>
-        14
+        <p class="indicator-label">TP/Project</p>
+        {{ ptp_ratio }}
     </div>
 
-    <div class="graph" id="weeklytp"></div>
-
-    <div class="graph" id="chartz"></div>
-
+    {% for project in projects %}
+    <div class="graph" id="{{ project["name"] }}_burndown"></div>
+    {% endfor %}
 
 {% endblock %}
 
@@ -94,31 +90,38 @@
             data: {},
         });
 
-
-        const chart = new frappe.Chart("#weeklytp", {  // or a DOM element,
-            // new Chart() in case of ES6 module with above usage
-            title: "Weekly Histogram",
+        {% for project in projects %}
+        new frappe.Chart("#{{ project['name'] }}_burndown", {
+            title: "{{ project["name"] }}",
             data: {
-                labels: ["w2-February","w3-February","w4-February", "w1-March", "w2-March", "w2-March", "w3-March", "w4-March", "w1-April", "w2-April", "w3-April"],
+                labels: {{ project["labels"] | safe }},
                 datasets: [
                     {
-                        name: "Prog Hrs", type: "area",
-                        values: [22, 25, 30, 35, 30, 32, 17, 22, 25, 23, 27]
+                        name: "Estimated Hrs",
+                        chartType: "line",
+                        values: {{ project["data"] }}
                     },
                     {
-                        name: "Misc Hrs", type: "area",
-                        values: [11, 9, 20, 25, 22, 19, 22, 10, 12, 10, 12]
+                        name: "Real Hrs",
+                        chartType: "line",
+                        values: {{ project["dataProg"] }}
                     },
                 ]
             },
             type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
             height: 250,
+            lineOptions: {
+                hideDots: 0, // default: 0
+                regionFill: 0
+            },
             //colors: ['#00a7e0', '#1e00e0','#00e038']
-            colors: ['#00a7e0', '#e00052', '#e0b700']
+            colors: ['#e00052', '#00a7e0', '#e0b700']
         });
+        {% endfor %}
 
         const data = {
-            labels: ["12am-3am", "3am-6pm", "6am-9am", "9am-12am",
+            labels: [
+                "12am-3am", "3am-6pm", "6am-9am", "9am-12am",
                 "12pm-3pm", "3pm-6pm", "6pm-9pm", "9am-12am"
             ],
             datasets: [

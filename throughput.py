@@ -5,9 +5,18 @@ from models.base import UserTaskTree
 
 def hour_string_to_float(hstr):
     intPart = int(hstr.split(":")[0])
-    floatPart = int(hstr.split(":")[1])
-
+    floatPart = int(hstr.split(":")[1]) / 60
     return intPart + floatPart
+
+
+def get_hour_dispersion(total, ratio):
+    data = []
+    while total > 0:
+        print(total)
+        data.append(total)
+        total = total - ratio
+    data.append(0)
+    return data
 
 
 def get_burndown_data(user_id):
@@ -24,8 +33,13 @@ def get_burndown_data(user_id):
         UserTaskTree.date > date_limit
     )
 
+    daily_throughput = 4
+    ptp_ratio = daily_throughput / trees.count()
+
     # Arreglo de datapoints por projecto
     project_burndowns = []
+
+
     for tree in trees:
         print(tree.date)
         for root in tree.nodes:
@@ -34,7 +48,10 @@ def get_burndown_data(user_id):
                 project_burndowns.append({
                     "name": root["label"],
                     "total": hour_string_to_float(root["_estimated_time"]),
-                    "starts": tree.date
+                    "starts": tree.date,
+                    "labels": ["mon","tus","w","th","f","s","d"],
+                    "data": get_hour_dispersion(hour_string_to_float(root["_estimated_time"]), ptp_ratio),
+                    "dataProg": [12.5, 9, 9, 8.5]
                 })
 
-    return project_burndowns
+    return daily_throughput, ptp_ratio, project_burndowns
