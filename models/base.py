@@ -10,6 +10,7 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+
 class User(BaseModel):
     username = CharField(max_length=255)
     password = CharField(null=True)
@@ -82,4 +83,5 @@ class UserExpandedNodes(BaseModel):
 db.connect()
 #db.create_tables([User, UserNotes, UserTaskTree])
 #db.create_tables([UserExpandedNodes])
-db.create_tables([UserDailyData])
+#db.create_tables([UserDailyData])
+db.create_tables([UserSession])

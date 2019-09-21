@@ -4,19 +4,24 @@ import random
 import string
 from functools import reduce
 
+import uvicorn
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from models.base import UserNotes, UserTaskTree, UserDailyData
+from auth import AuthEndpoint, CookieBasedAuthBackend
+from models.base import UserNotes, UserTaskTree, UserDailyData, User, UserSession
 from throughput import get_burndown_data
 from tree_stuff import traverse_json_tree_list
 
-templates = Jinja2Templates(directory='templates')
 
 app = Starlette(debug=True)
+app.add_middleware(AuthenticationMiddleware, backend=CookieBasedAuthBackend())
+
+templates = Jinja2Templates(directory='templates')
 import socket
 if ".local" not in socket.gethostname():
     #app.add_middleware(HTTPSRedirectMiddleware)
@@ -25,7 +30,7 @@ app.mount('/static', StaticFiles(directory='statics'), name='static')
 
 
 @app.route("/")
-class HomepageView(HTTPEndpoint):
+class HomepageView(AuthEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
         return templates.TemplateResponse('index.html', {'request': request })
@@ -41,19 +46,39 @@ class LoginView(HTTPEndpoint):
 
         return templates.TemplateResponse('login.html', {'request': request })
 
-    async def post(self, request):
-        return templates.TemplateResponse('index.html', {'request': request })
+    async def post(self, request, **kwargs):
+        form = await request.form()
+        print(form["username"])
+        print(form["password"])
+        try:
+            user = User.get(User.username==form["username"], User.password==form["password"])
+        except User.DoesNotExist:
+            user = None
+        if user:
+            try:
+                usesh = UserSession.get(UserSession.user == user)
+            except UserSession.DoesNotExist:
+                usesh = UserSession()
+                usesh.user = user
+                usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+                usesh.device = "device"
+            response = RedirectResponse(url='/')
+            response.set_cookie("sessionid", usesh.sessionid)
+            return response
+        else:
+            return templates.TemplateResponse('login.html', {'request': request, 'error': "bad credentials" })
 
 
 @app.route("/diary")
-class DiaryView(HTTPEndpoint):
+class DiaryView(AuthEndpoint):
+
     async def get(self, request):
         today = datetime.datetime.now()
         return RedirectResponse(url="/diary/{0:02d}-{1:02d}-{2:02d}".format(today.year,today.month,today.day))
 
 
 @app.route("/diary/{date}")
-class DiarySpecificView(HTTPEndpoint):
+class DiarySpecificView(AuthEndpoint):
 
     async def get(self, request):
         date = datetime.date.fromisoformat(request.path_params["date"])
@@ -184,7 +209,7 @@ class DiarySpecificView(HTTPEndpoint):
 
 
 @app.route("/throughput")
-class ThroughputView(HTTPEndpoint):
+class ThroughputView(AuthEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
         return templates.TemplateResponse('throughput.html', {'request': request })
@@ -195,7 +220,7 @@ class ThroughputView(HTTPEndpoint):
 
 
 @app.route("/burn-down")
-class BurnDownView(HTTPEndpoint):
+class BurnDownView(AuthEndpoint):
     async def get(self, request):
         daily_tp, ptp_ratio, projects = get_burndown_data(2)
 
@@ -204,3 +229,15 @@ class BurnDownView(HTTPEndpoint):
     async def post(self, request):
 
         return templates.TemplateResponse('burn-down.html', {'request': request })
+
+
+@app.route('/logout')
+async def logout(request):
+    response = RedirectResponse(url='/login')
+    response.delete_cookie("sessionid")
+    return response
+
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=5000, log_level="info")
