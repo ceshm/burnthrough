@@ -62,6 +62,7 @@ class LoginView(HTTPEndpoint):
                 usesh.user = user
                 usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
                 usesh.device = "device"
+                usesh.save()
             response = RedirectResponse(url='/')
             response.set_cookie("sessionid", usesh.sessionid)
             return response
