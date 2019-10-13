@@ -164,11 +164,11 @@ class DiarySpecificView(AuthEndpoint):
             pre_actions.append(transfer)
 
         try:
-            tree = UserTaskTree.get(UserTaskTree.date == date)
+            tree = UserTaskTree.get(UserTaskTree.date == date,  UserTaskTree.user == self.user)
         except UserTaskTree.DoesNotExist:
             #print("tree does not exist...")
             tree = UserTaskTree()
-            tree.user = 2
+            tree.user = self.user
             tree.date = date
             tree.name = "awdawd"
         if tree.nodes:
@@ -203,7 +203,7 @@ class DiarySpecificView(AuthEndpoint):
                     to_tree = UserTaskTree.get(UserTaskTree.date == to_tree_date)
                 except UserTaskTree.DoesNotExist:
                     to_tree = UserTaskTree()
-                    to_tree.user = 2
+                    to_tree.user = self.user
                     to_tree.name = "awdawd"
                     to_tree.date = to_tree_date
                 if to_tree:
@@ -223,17 +223,17 @@ class DiarySpecificView(AuthEndpoint):
 
         json_notes = json.loads(form["notes"])
         try:
-            notes = UserNotes.get(UserNotes.user == 2)
+            notes = UserNotes.get(UserNotes.user == self.user)
             #print("Notes found!")
         except UserNotes.DoesNotExist:
             #print("Notes not exist...")
             notes = UserNotes()
-            notes.user = 2
+            notes.user = self.user
         notes.notes = json_notes
         notes.save()
 
         try:
-            daily_data = UserDailyData.get(UserDailyData.user == 2, UserDailyData.date == date)
+            daily_data = UserDailyData.get(UserDailyData.user == self.user, UserDailyData.date == date)
             # print("Notes found!")
         except UserDailyData.DoesNotExist:
             daily_data = None
@@ -242,7 +242,7 @@ class DiarySpecificView(AuthEndpoint):
             if not daily_data:
                 # print("Notes not exist...")
                 daily_data = UserDailyData()
-                daily_data.user = 2
+                daily_data.user = self.user
                 daily_data.date = date
                 daily_data.data = {}
             daily_data.data["levels"] = json_levels
