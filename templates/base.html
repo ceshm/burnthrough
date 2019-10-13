@@ -172,8 +172,8 @@
     <el-main style="padding: 0; overflow-x: hidden">
 
         <div class="container-fluid" style="height: calc(100vh - 62px)">
-            <div class="row-offcanvas active">
-
+            <div class="{% if request.url.path != "/"  %}row-offcanvas active{% endif %}" style="height: 100%">
+                {% if request.url.path != "/"  %}
                 <div class="sidebar-offcanvas sidebar">
                     <div style="width: 100%; height: 35px">
                         <span style="font-size: 20px; font-weight: 400">Notes</span>
@@ -231,13 +231,15 @@
                     </draggable>
 
                 </div><!-- /.cols-->
+                {% endif %}
 
                 <div class="content">
-
+                    {% if request.url.path != "/"  %}
                     <p class="pull-right">
                         <a type="button" class="btn btn-collapse btn-sm" data-toggle="offcanvas"><i
                                 class="glyphicon glyphicon-chevron-down"></i></a>
                     </p>
+                    {% endif %}
 
                     <div style="padding: 15px; width: 100%; min-height: calc(100% - 55px); overflow: scroll">
                         {% block content %}{% endblock %}

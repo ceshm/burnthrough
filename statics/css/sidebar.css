@@ -56,6 +56,7 @@ body {
     transition: all 0.3s ease-out;
       height: 100%;
   }
+
   .row-offcanvas.active {
     right: 0;
     /* 3 columns */
