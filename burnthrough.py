@@ -135,12 +135,12 @@ class DiarySpecificView(AuthEndpoint):
         except UserTaskTree.DoesNotExist:
             tree = None
         try:
-            notes = UserNotes.get(UserNotes.user == 2)
+            notes = UserNotes.get(UserNotes.user == self.user)
         except UserNotes.DoesNotExist:
             notes = None
 
         try:
-            daily_data = UserDailyData.get(UserDailyData.user == 2, UserDailyData.date == date)
+            daily_data = UserDailyData.get(UserDailyData.user == self.user, UserDailyData.date == date)
         except UserDailyData.DoesNotExist:
             daily_data = None
 
