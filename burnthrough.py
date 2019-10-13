@@ -130,7 +130,7 @@ class DiarySpecificView(AuthEndpoint):
 
         #today = datetime.date(2019, 4, 16)
         try:
-            tree = UserTaskTree.get(UserTaskTree.date == date, UserNotes.user == self.user)
+            tree = UserTaskTree.get(UserTaskTree.date == date, UserTaskTree.user == self.user)
             traverse_json_tree_list(tree.nodes)
         except UserTaskTree.DoesNotExist:
             tree = None
