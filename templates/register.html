@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BurnThrough</title>
+    {# <link rel="icon" href="{{ url_for('static', path='img/laser-squere.png') }}"> #}
+    <link rel="icon" href="/static/img/laser-squere.png">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
+
+    <style>
+        div {
+            font-family: Quicksand, Sans-Serif;
+        }
+
+        [v-cloak] > * {
+            display: none;
+        }
+
+        /*
+        [v-cloak]::before {
+            content: "<h1>loading...</h1>";
+        }
+        */
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body style="background-color: rgb(250, 250, 255)">
+
+    <div class="col-md-4 col-sm-3"></div>
+
+    <div class="col-md-4 col-sm-6 col-xs-12"
+         style="box-shadow: 0 4px 10px rgba(0,0,0,.15); margin-top: 50px; padding: 25px; border-radius: 10px; background-color: white">
+        {#
+        <center>
+            <img src="/static/img/laser-squere.png" width="60">
+            <h2>BurnThrough</h2>
+        </center>#}
+        <br>
+
+        <form method="post" ref="form">
+            <input class="form-control" name="username" placeholder="username" required/> <br>
+            <input class="form-control" name="password" type="password" placeholder="password" required/><br>
+            <input class="form-control" name="password_confirm" type="password" placeholder="password confirm" required/><br>
+            <button class="btn btn-primary" type="submit"
+               style="width: 100%; background-color: rgb(0, 167, 224); border-color: rgb(0, 167, 224)">Register</button>
+            <div style="text-align: center;width:100%;padding-top: 25px"><a href="/login">Go to login page</a></div>
+        </form>
+        {#
+            <a class="btn btn-primary" style="background-color: black"
+               href="https://github.com/login/oauth/authorize?scope=user:email&client_id=7851154fc76a8a0694ba">
+                Login <i class="fab fa-github"></i>
+            </a>#}
+    </div>
+
+</body>
+
+<script
+        src="https://code.jquery.com/jquery-3.4.0.slim.min.js"
+        integrity="sha256-ZaXnYkHGqIhqTbJ6MB4l9Frs/r7U4jlx7ir8PJYBqbI="
+        crossorigin="anonymous"></script>
+<script src="//unpkg.com/vue"></script>
+<script src="//unpkg.com/element-ui"></script>
+<script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+
+<script>
+    ELEMENT.locale(ELEMENT.lang.en);
+    var vue = new Vue({});
+    {% if error %}
+        vue.$message.error("{{ error }}");
+    {% endif %}
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</html>
+
