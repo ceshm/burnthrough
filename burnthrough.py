@@ -70,6 +70,48 @@ class LoginView(HTTPEndpoint):
             return templates.TemplateResponse('login.html', {'request': request, 'error': "bad credentials" })
 
 
+@app.route("/register")
+class RegisterView(HTTPEndpoint):
+    async def get(self, request):
+        #today = datetime.date(2019, 4, 16)
+
+        return templates.TemplateResponse('register.html', {'request': request })
+
+    async def post(self, request, **kwargs):
+        form = await request.form()
+        print(form["username"])
+        print(form["password"])
+        print(form["password_confirm"])
+
+
+        try:
+            user = User.get(User.username==form["username"])
+        except User.DoesNotExist:
+            user = None
+        if user:
+            return templates.TemplateResponse('register.html', {'request': request, 'error': "username already exists"})
+
+        if form["password"] != form["password_confirm"]:
+            return templates.TemplateResponse('register.html', {'request': request, 'error': "passwords do not match"})
+        else:
+            user = User()
+            user.username = form["username"]
+            user.password = form["password"]
+            user.data = []
+            user.save()
+            try:
+                usesh = UserSession.get(UserSession.user == user)
+            except UserSession.DoesNotExist:
+                usesh = UserSession()
+                usesh.user = user
+                usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+                usesh.device = "device"
+                usesh.save()
+            response = RedirectResponse(url='/')
+            response.set_cookie("sessionid", usesh.sessionid)
+            return response
+
+
 @app.route("/diary")
 class DiaryView(AuthEndpoint):
 
