@@ -9,3 +9,12 @@ task management system
  - Keep track of your weekly throughput (not impleneted yet)
 
 
+## Requirements
+
+#### Python >= 3.6
+
+Developed using:
+- Python 3.7.1
+- Starlette 0.12.9
+- uvicorn 0.9.0
+- Jinja 2.10.1
