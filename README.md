@@ -1,6 +1,6 @@
 # BurnThrough
 
-task management system
+Task management system. live demo at [burnthrough.ceshm.com](https://burnthrough.ceshm.com)
 
  - Add and move around tasks in a tree structure
  - Estimate time for each task
