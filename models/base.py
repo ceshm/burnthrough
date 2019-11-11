@@ -3,7 +3,16 @@ import json
 from peewee import Model, CharField, PostgresqlDatabase, TextField, IntegerField, DateField, ForeignKeyField
 from playhouse.postgres_ext import JSONField
 
-db = PostgresqlDatabase('burnthrough', user="cesar", password="cesar2019", host="127.0.0.1", port=5432)
+with open('config.json') as config_file:
+    db_config = json.load(config_file)["database"]
+
+db = PostgresqlDatabase(
+    db_config["name"],
+    user=db_config["user"],
+    password=db_config["password"],
+    host=db_config["host"],
+    port=db_config["port"]
+)
 
 
 class BaseModel(Model):
