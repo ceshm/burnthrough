@@ -37,3 +37,9 @@ Add a config.json file at the root folder, with the following structure:
   }
 }
 ```
+
+## Running
+Start the server, using the uvicorn command:
+```
+$ uvicorn burnthrough:app --port 3000
+```
