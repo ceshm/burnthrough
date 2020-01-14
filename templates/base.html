@@ -3,99 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>BurnThrough</title>
-    {# <link rel="icon" href="{{ url_for('static', path='img/laser-squere.png') }}"> #}
     <link rel="icon" href="/static/img/laser-squere.png">
-    <!-- import CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,700" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Caveat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Caveat" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/sidebar.css">
-
-    <style>
-        body, text, li {
-            font-family: Quicksand, Sans-Serif;
-        }
-        [v-cloak] > * {
-            display: none;
-        }
-        a:hover{
-            text-decoration: none;
-        }
-        .menu-icon{
-            font-size: 16px;
-            margin: -5px 15px 0 5px;
-        }
-        input {
-            box-shadow: none !important
-        }
-
-        p[contenteditable] {
-            max-height: 200px;
-            max-width: 100%;
-            overflow: auto;
-            white-space: pre-line;
-            margin-bottom: 1px;
-            padding-top: 5px;
-            color: #5f6368;
-        }
-        .estimated_time{
-            //background-color: #e00052;
-            color: #e00052;
-            font-size: 12px;
-            border: 1px solid #e00052;
-            border-radius: 8px;
-            padding: 0px 6px;
-            margin-right: 15px;
-            width: 54px;
-            display: inline-block;
-            text-align: center;
-        }
-        ._estimated_time{
-            color: rgba(224, 0, 82, .75);
-            font-size: 9px;
-            border-radius: 8px;
-            padding: 0px 6px;
-            margin-right: 15px;
-            width: 54px;
-            display: inline-block;
-            text-align: center;
-            position: relative;
-            top: -5px;
-        }
-        .time_spent {
-            color: #00a7e0;
-            font-size: 13px;
-            font-weight: lighter;
-            border-radius: 8px;
-            margin-left: 7px;
-        }
-        .time_spent_badge {
-            //background-color: #00a7e0;
-            color: #00a7e0;
-            font-size: 12px;
-            border: 1px solid #00a7e0;
-            border-radius: 8px;
-            padding: 0px 6px;
-            margin-right: 15px;
-            min-width: 60px;
-            max-width: 90px;
-            display: inline-block;
-            text-align: center;
-        }
-        .node-text {
-            font-family: Helvetica, Arial, sans-serif;
-            font-weight: 400;
-            color: black;
-        }
-        /*
-        [v-cloak]::before {
-            content: "<h1>loading...</h1>";
-        }
-        */
-    </style>
+    <link rel="stylesheet" href="/static/css/base.css">
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -133,27 +49,6 @@
             <a href="/burn-down"><el-menu-item index="2-3"><i class="fas fa-fire menu-icon"></i> Burn Down </el-menu-item> </a>
 
         </el-menu-item-group>
-        {#
-        <el-submenu index="2-4">
-            <template slot="title">Option 4</template>
-            <el-menu-item index="2-4-1">Option 4-1</el-menu-item>
-        </el-submenu>
-        <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>Perfil</template>
-        <el-menu-item-group>
-          <template slot="title">Group 1</template>
-          <el-menu-item index="1-1">Option 1</el-menu-item>
-          <el-menu-item index="1-2">Option 2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="Group 2">
-          <el-menu-item index="1-3">Option 3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">Option4</template>
-          <el-menu-item index="1-4-1">Option 4-1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-        #}
 
     </el-menu>
 
