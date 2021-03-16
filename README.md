@@ -38,6 +38,11 @@ Add a config.json file at the root folder, with the following structure:
 }
 ```
 
+## Run initial migration
+```
+$ python initial_migration.py
+```
+
 ## Running
 Start the server, using the uvicorn command:
 ```
