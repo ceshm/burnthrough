@@ -14,8 +14,8 @@ from starlette.templating import Jinja2Templates
 
 from auth import AuthEndpoint, CookieBasedAuthBackend
 from models.base import UserNotes, UserTaskTree, UserDailyData, User, UserSession
-from throughput import get_burndown_data
-from tree_stuff import traverse_json_tree_list
+from helpers.throughput import get_burndown_data
+from helpers.tree_stuff import traverse_json_tree_list
 
 
 app = Starlette(debug=True)
