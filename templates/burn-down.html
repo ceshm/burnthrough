@@ -1,111 +1,110 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/static/css/burndownStyles.css">
+  <link rel="stylesheet" href="/static/css/burndownStyles.css">
 {% endblock %}
 
 {% block header %}
-    <el-date-picker
-            type="date"
-            placeholder="Change Day"
-            {#  @change="dateChange" #}
-    >
-    </el-date-picker>
+  <el-date-picker
+    type="date"
+    placeholder="Change Day"
+    {#  @change="dateChange" #}
+  >
+  </el-date-picker>
 
 {% endblock %}
 
 {% block content %}
 
-    {% for project in projects %}
-        {{ project["name"] }}: {{ project["total"] }}, starts: {{ project["starts"] }} <br/>
-    {% endfor %}
+  {% for project in projects %}
+    {{ project["name"] }}: {{ project["total"] }}, starts: {{ project["starts"] }} <br/>
+  {% endfor %}
 
-    <br/>
+  <br/>
 
-    <div class="indicator primary">
-        <p class="indicator-label">Daily TP</p>
-        {{ daily_tp }}
-    </div>
+  <div class="indicator primary">
+    <p class="indicator-label">Daily TP</p>
+    {{ daily_tp }}
+  </div>
 
-    <div class="indicator secondary">
-        <p class="indicator-label">TP/Project</p>
-        {{ ptp_ratio }}
-    </div>
+  <div class="indicator secondary">
+    <p class="indicator-label">TP/Project</p>
+    {{ ptp_ratio }}
+  </div>
 
-    {% for project in projects %}
+  {% for project in projects %}
     <div class="graph" id="{{ project["name"] }}_burndown"></div>
-    {% endfor %}
+  {% endfor %}
 
 {% endblock %}
 
 {% block extra_js %}
-    <script>
-        var vue = new Vue({
-            el: '#app',
-            delimiters: ["[[", "]]"],
-            data: {},
-        });
+  <script>
+    var vue = new Vue({
+      el: '#app',
+      delimiters: ["[[", "]]"],
+      data: {},
+    });
 
-        {% for project in projects %}
-        new frappe.Chart("#{{ project['name'] }}_burndown", {
-            title: "{{ project["name"] }}",
-            data: {
-                labels: {{ project["labels"] | safe }},
-                datasets: [
-                    {
-                        name: "Estimated Hrs",
-                        chartType: "line",
-                        values: {{ project["data"] }}
-                    },
-                    {
-                        name: "Real Hrs",
-                        chartType: "line",
-                        values: {{ project["dataProg"] }}
-                    },
-                ]
+    {% for project in projects %}
+      new frappe.Chart("#{{ project['name'] }}_burndown", {
+        title: "{{ project["name"] }}",
+        data: {
+          labels: {{ project["labels"] | safe }},
+          datasets: [
+            {
+              name: "Estimated Hrs",
+              chartType: "line",
+              values: {{ project["data"] }}
             },
-            type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
-            height: 250,
-            lineOptions: {
-                hideDots: 0, // default: 0
-                regionFill: 0
+            {
+              name: "Real Hrs",
+              chartType: "line",
+              values: {{ project["dataProg"] }}
             },
-            //colors: ['#00a7e0', '#1e00e0','#00e038']
-            colors: ['#e00052', '#00a7e0', '#e0b700']
-        });
-        {% endfor %}
+          ]
+        },
+        type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
+        height: 250,
+        lineOptions: {
+          hideDots: 0, // default: 0
+          regionFill: 0
+        },
+        //colors: ['#00a7e0', '#1e00e0','#00e038']
+        colors: ['#e00052', '#00a7e0', '#e0b700']
+      });
+    {% endfor %}
 
-        const data = {
-            labels: [
-                "12am-3am", "3am-6pm", "6am-9am", "9am-12am",
-                "12pm-3pm", "3pm-6pm", "6pm-9pm", "9am-12am"
-            ],
-            datasets: [
-                {
-                    name: "Some Data", type: "bar",
-                    values: [25, 40, 30, 35, 8, 52, 17, -4]
-                },
-                {
-                    name: "Another Set", type: "line",
-                    values: [25, 50, -10, 15, 18, 32, 27, 14]
-                },
-                {
-                    name: "Trianother Set", type: "line",
-                    values: [20, 20, -10, 5, -5, 12, 37, 28]
-                }
-            ]
-        };
-        const chart2 = new frappe.Chart("#chartz", {  // or a DOM element,
-            // new Chart() in case of ES6 module with above usage
-            title: "",
-            data: data,
-            type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
-            height: 250,
-            //colors: ['#00a7e0', '#1e00e0','#00e038']
-            colors: ['#00a7e0', '#e00052','#e0b700']
-        })
+    const data = {
+      labels: [
+        "12am-3am", "3am-6pm", "6am-9am", "9am-12am",
+        "12pm-3pm", "3pm-6pm", "6pm-9pm", "9am-12am"
+      ],
+      datasets: [
+        {
+          name: "Some Data", type: "bar",
+          values: [25, 40, 30, 35, 8, 52, 17, -4]
+        },
+        {
+          name: "Another Set", type: "line",
+          values: [25, 50, -10, 15, 18, 32, 27, 14]
+        },
+        {
+          name: "Trianother Set", type: "line",
+          values: [20, 20, -10, 5, -5, 12, 37, 28]
+        }
+      ]
+    };
+    const chart2 = new frappe.Chart("#chartz", {  // or a DOM element,
+      // new Chart() in case of ES6 module with above usage
+      title: "",
+      data: data,
+      type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
+      height: 250,
+      //colors: ['#00a7e0', '#1e00e0','#00e038']
+      colors: ['#00a7e0', '#e00052', '#e0b700']
+    })
 
-    </script>
-
+  </script>
 {% endblock %}
 

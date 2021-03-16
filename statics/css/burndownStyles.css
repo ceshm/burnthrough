@@ -1,54 +1,54 @@
 .el-header {
-    background-color: #B3C0D1;
-    color: #333;
-    line-height: 60px;
+  background-color: #B3C0D1;
+  color: #333;
+  line-height: 60px;
 }
 
 .el-aside {
-    color: #333;
+  color: #333;
 }
 
 .indicator {
-    width: 100px;
-    text-align: center;
-    color: white;
-    font-size: 44px;
-    border-radius: 10px;
-    padding-bottom: 2px;
-    display: inline-block;
-    margin: 0 5px 10px 0;
+  width: 100px;
+  text-align: center;
+  color: white;
+  font-size: 44px;
+  border-radius: 10px;
+  padding-bottom: 2px;
+  display: inline-block;
+  margin: 0 5px 10px 0;
 }
 
 .indicator-label {
-    font-size: 12px;
-    margin-bottom: -5px;
-    margin-top: 10px
+  font-size: 12px;
+  margin-bottom: -5px;
+  margin-top: 10px
 }
 
 .primary {
-    background-color: #00a7e0;
+  background-color: #00a7e0;
 }
 
 .secondary {
-    background-color: #e00052;
+  background-color: #e00052;
 }
 
 .tertiary {
-    background-color: #e0b700;
+  background-color: #e0b700;
 }
 
 .gradient {
-    background: linear-gradient(135deg, rgba(0, 167, 224, 1) 20%, rgba(224, 0, 82, 1) 100%);
+  background: linear-gradient(135deg, rgba(0, 167, 224, 1) 20%, rgba(224, 0, 82, 1) 100%);
 }
 
 .graph {
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 44px;
-    border-radius: 10px;
-    display: inline-block;
-    margin: 0 5px 10px 0;
-    border: 1px solid rgb(229, 232, 237);
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 44px;
+  border-radius: 10px;
+  display: inline-block;
+  margin: 0 5px 10px 0;
+  border: 1px solid rgb(229, 232, 237);
 }
 

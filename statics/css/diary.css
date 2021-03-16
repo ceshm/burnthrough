@@ -1,32 +1,31 @@
 .el-header {
-    background-color: #B3C0D1;
-    color: #333;
-    line-height: 60px;
+  background-color: #B3C0D1;
+  color: #333;
+  line-height: 60px;
 }
 
 .el-aside {
-    color: #333;
+  color: #333;
 }
 
 .el-dialog__body {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 .level-label {
-    margin-top: 15px;
+  margin-top: 15px;
 }
 
 .iconwill {
-    padding-right: 2.5px;
-    padding-left: 2.5px;
+  padding-right: 2.5px;
+  padding-left: 2.5px;
 }
 
 .icongroove {
-/ / margin-right: 3 px;
-    transform: scale(.90, 1);
+  transform: scale(.90, 1);
 }
 
 .iconcalmness {
-    margin-right: 3px;
-    transform: scale(.90, 1);
+  margin-right: 3px;
+  transform: scale(.90, 1);
 }

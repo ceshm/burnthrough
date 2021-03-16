@@ -1,260 +1,274 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/static/css/diary.css">
+  <link rel="stylesheet" href="/static/css/diary.css">
 {% endblock %}
 
 {% block header %}
-    <el-button class="pull-left" type="primary" style="margin-top: 10px" :disabled="!saveEnabled" v-on:click="save">Save</el-button>
+  <el-button class="pull-left" type="primary" style="margin-top: 10px" :disabled="!saveEnabled" v-on:click="save">Save
+  </el-button>
 
-    <a href="/diary/{{ prev_date.year }}-{{ '%02d' % prev_date.month }}-{{ '%02d' % prev_date.day }}"><el-button type="default" icon="el-icon-arrow-left" style="padding-right: 10px; padding-left: 10px"></el-button></a>
-    <el-date-picker
-        v-model="date"
-        type="date"
-        placeholder="Change Day"
-        @change="dateChange"
-    >
-    </el-date-picker>
-    <a href="/diary/{{ next_date.year }}-{{ '%02d' % next_date.month }}-{{ '%02d' % next_date.day }}"><el-button type="default" icon="el-icon-arrow-right" style="padding-right: 10px; padding-left: 10px"></el-button></a>
+  <a href="/diary/{{ prev_date.year }}-{{ '%02d' % prev_date.month }}-{{ '%02d' % prev_date.day }}">
+    <el-button type="default" icon="el-icon-arrow-left" style="padding-right: 10px; padding-left: 10px"></el-button>
+  </a>
+  <el-date-picker
+    v-model="date"
+    type="date"
+    placeholder="Change Day"
+    @change="dateChange"
+  >
+  </el-date-picker>
+  <a href="/diary/{{ next_date.year }}-{{ '%02d' % next_date.month }}-{{ '%02d' % next_date.day }}">
+    <el-button type="default" icon="el-icon-arrow-right" style="padding-right: 10px; padding-left: 10px"></el-button>
+  </a>
 {% endblock %}
 
 {% block content %}
-    <b style="font-size: 24px">{{ date.day }}/{{ date.month }}: </b>
-    <el-button
-        icon="el-icon-s-operation"
-        class="pull-left"
-        style="padding: 8px 12px; margin-right: 10px;"
-        {% if daily_data and daily_data.levels %}type="primary" plain{% endif %}
-        @click="makeLevelsDialogVisible">
-    </el-button>
+  <b style="font-size: 24px">{{ date.day }}/{{ date.month }}: </b>
+  <el-button
+    icon="el-icon-s-operation"
+    class="pull-left"
+    style="padding: 8px 12px; margin-right: 10px;"
+    {% if daily_data and daily_data.levels %}type="primary" plain{% endif %}
+    @click="makeLevelsDialogVisible"
+  >
+  </el-button>
 
-    <el-button
-        icon="el-icon-plus"
-        circle
-        class="pull-right"
-        style="padding: 8px"
-        @click="() => append()">
-    </el-button>
+  <el-button
+    icon="el-icon-plus"
+    circle
+    class="pull-right"
+    style="padding: 8px"
+    @click="() => append()">
+  </el-button>
 
+  <br/>
+
+  <el-tree
+    :data="nodes"
+    node-key="id"
+    @node-drag-start="handleDragStart"
+    @node-drag-enter="handleDragEnter"
+    @node-drag-leave="handleDragLeave"
+    @node-drag-over="handleDragOver"
+    @node-drag-end="handleDragEnd"
+    @node-drop="handleDrop"
+    @node-expand="nodeExpanded"
+    @node-collapse="nodeCollapsed"
+    :default-expanded-keys="expandedNodes"
+    draggable
+    :allow-drop="allowDrop"
+    :allow-drag="allowDrag"
+    :expand-on-click-node="false"
+    {#  :render-content="renderContent"#}
+    style="height: 45px; padding-top: 10px"
+    {# @node-contextmenu="nodecontext"#}
+  >
+    <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%; background-color: transparent">
+      <span>
+      <el-popover
+        placement="bottom"
+        title=""
+        width="350"
+        trigger="click"
+        content="this is content, this is content, this is content"
+        @show="()=>taskPopped(node.key)"
+        @after-leave="()=>afterLeave(node.key)"
+      >
+          <label>Name:</label><br/>
+          <input
+            class="form-control input-sm"
+            :data="node"
+            :value="node.label"
+            :id="node.key+'_name'"
+            type="text"
+            @change="(event) => taskeditname(event, node)"
+            style="margin-bottom: 10px; box-shadow: none"
+          >
+
+          <label>Time Spent:</label><br/>
+          <el-time-select
+            placeholder="Start time"
+            v-model="node.data.time_spent[0]"
+            size="mini"
+            :picker-options="{
+              start: '08:30',
+              step: '00:15',
+              end: '23:30'
+            }"
+            style="width: 49%"
+          >
+          </el-time-select>
+          <el-time-select
+            placeholder="End time"
+            v-model="node.data.time_spent[1]"
+            size="mini"
+            :picker-options="{
+              start: '08:30',
+              step: '00:15',
+              end: '23:30'
+            }"
+            style="width: 49%"
+          >
+          </el-time-select>
+
+          <label style="margin-top: 10px">Estimated Time:</label><br/>
+          <el-time-select
+            v-model="node.data.estimated_time"
+            size="mini"
+            :picker-options="{
+              start: '00:5',
+              step: '00:5',
+              end: '8:00'
+            }"
+            style="width: 99%"
+            placeholder="Select time"
+          >
+          </el-time-select>
+
+        </template>
+
+        <span slot="reference" :id="node.key+'_poplabel'">
+          <span class="node-text">[[ node.label ]]</span>
+          <span v-if="!!node.data.time_spent[0]" class="time_spent">[[ node.data.time_spent[0] ]] <span
+                  v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</span>
+          <span v-if="!!node.data._estimated_time && node.data._estimated_time!='00:00'"
+                class="_estimated_time">@[[ node.data._estimated_time ]] </span>
+        </span>
+      </el-popover>
+      </span>
+
+      <span class="pull-right">
+        <span v-if="!!node.data.estimated_time" class="estimated_time">[[ node.data.estimated_time ]] <i
+                class="fas fa-fire" style="font-size: 11px;"></i></span>
+
+        <el-button
+          size="mini"
+          icon="el-icon-plus"
+          circle
+          style="padding: 2px"
+          @click="() => append(data)">
+        </el-button>
+        <el-dropdown @command="cmd=>handleTransferCommand(cmd,node)">
+          <el-button
+                  size="mini"
+                  icon="el-icon-d-arrow-right"
+                  circle
+                  style="padding: 2px"
+          >
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="mv">Move for tomorrow</el-dropdown-item>
+            <el-dropdown-item command="cp">Copy for tomorrow</el-dropdown-item>
+            <el-dropdown-item command="mcsd">To specific date...</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+
+        <el-button
+          size="mini"
+          icon="el-icon-delete"
+          circle
+          style="padding: 2px; margin-left: 15px"
+          @click="() => remove(node)">
+        </el-button>
+      </span>
+    </span>
+  </el-tree>
+
+  <el-dialog
+    title="Transfer task"
+    :visible.sync="dialogVisible"
+    width="320px"
+    style="text-align: center"
+  >
+    <p>"[[ transferTask.label ]]"</p>
+
+    <el-select v-model="transferType" placeholder="Select">
+      <el-option key="1" label="Move" value="mv">Move</el-option>
+      <el-option key="2" label="Copy" value="cp">Copy</el-option>
+    </el-select>
+    <br/>
+    <br/>
+    <el-date-picker
+      v-model="transferDate"
+      type="date"
+      placeholder="Select Date"
+    >
+    </el-date-picker>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false">Cancel</el-button>
+      <el-button type="primary" @click="()=> { dialogVisible = false; transferConfirm() }">Confirm</el-button>
+    </span>
+  </el-dialog>
+
+  <el-dialog
+    :visible.sync="levelsDialogVisible"
+    width="300px"
+    style="text-align: center"
+  >
+    <label class="level-label">Sleep</label><br/>
+    <el-input-number v-model="levels.sleep" :min="1" :step="0.5" :max="12" size="mini"></el-input-number>
     <br/>
 
-    <el-tree
-        :data="nodes"
-        node-key="id"
-        @node-drag-start="handleDragStart"
-        @node-drag-enter="handleDragEnter"
-        @node-drag-leave="handleDragLeave"
-        @node-drag-over="handleDragOver"
-        @node-drag-end="handleDragEnd"
-        @node-drop="handleDrop"
-        @node-expand="nodeExpanded"
-        @node-collapse="nodeCollapsed"
-        :default-expanded-keys="expandedNodes"
-        draggable
-        :allow-drop="allowDrop"
-        :allow-drag="allowDrag"
-        :expand-on-click-node="false"
-        {#  :render-content="renderContent"#}
-        style="height: 45px; padding-top: 10px"
-        {# @node-contextmenu="nodecontext"#}
-    >
-        <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%; background-color: transparent">
-            <span>
-            <el-popover
-                placement="bottom"
-                title=""
-                width="350"
-                trigger="click"
-                content="this is content, this is content, this is content"
-                @show="()=>taskPopped(node.key)"
-                @after-leave="()=>afterLeave(node.key)"
-            >
-                <label>Name:</label><br/>
-                <input
-                    class="form-control input-sm"
-                    :data="node"
-                    :value="node.label"
-                    :id="node.key+'_name'"
-                    type="text"
-                    @change="(event) => taskeditname(event, node)"
-                    style="margin-bottom: 10px; box-shadow: none"
-                >
+    <label class="level-label">Caffeine</label><br/>
+    <el-input-number v-model="levels.caffeine" :min="1" :step="0.25" :max="10" size="mini"></el-input-number>
+    <br/>
 
-                <label>Time Spent:</label><br/>
-                <el-time-select
-                    placeholder="Start time"
-                    v-model="node.data.time_spent[0]"
-                    size="mini"
-                    :picker-options="{
-                      start: '08:30',
-                      step: '00:15',
-                      end: '23:30'
-                    }"
-                    style="width: 49%"
-                >
-                </el-time-select>
-                <el-time-select
-                    placeholder="End time"
-                    v-model="node.data.time_spent[1]"
-                    size="mini"
-                    :picker-options="{
-                      start: '08:30',
-                      step: '00:15',
-                      end: '23:30'
-                    }"
-                    style="width: 49%"
-                >
-                </el-time-select>
+    <label class="level-label">Calmness</label>
+    <el-rate
+      v-model="levels.calmness"
+      :icon-classes="['fa fa-spa iconcalmness','fa fa-spa iconcalmness','fa fa-spa iconcalmness']"
+      :void-icon-class="'fa fa-spa iconcalmness'"
+      :colors="['#00a7e0','#00a7e0','#00a7e0']">
+    </el-rate>
 
-                <label style="margin-top: 10px">Estimated Time:</label><br/>
-                <el-time-select
-                    v-model="node.data.estimated_time"
-                    size="mini"
-                    :picker-options="{
-                    start: '00:5',
-                    step: '00:5',
-                    end: '8:00'
-                    }"
-                    style="width: 99%"
-                    placeholder="Select time"
-                >
-                </el-time-select>
+    <label class="level-label">Flow</label>
+    <el-rate
+      v-model="levels.groove"
+      :icon-classes="['fa fa-music icongroove','fa fa-music icongroove','fa fa-music icongroove']"
+      :void-icon-class="'fa fa-music icongroove'"
+      :colors="['#00a7e0','#00a7e0','#00a7e0']">
+    </el-rate>
 
-                </template>
+    <label class="level-label">Will</label>
+    <el-rate
+      v-model="levels.will"
+      :icon-classes="['fa fa-fire iconwill','fa fa-fire iconwill','fa fa-fire iconwill']"
+      :void-icon-class="'fa fa-fire iconwill'"
+      :colors="['#00a7e0','#00a7e0','#00a7e0']">
+    </el-rate>
 
-                <span slot="reference" :id="node.key+'_poplabel'">
-                    <span class="node-text">[[ node.label ]]</span>
-                    <span v-if="!!node.data.time_spent[0]" class="time_spent">[[ node.data.time_spent[0] ]] <span v-if="!!node.data.time_spent[0]">-</span> [[ node.data.time_spent[1] ]]</span>
-                    <span v-if="!!node.data._estimated_time && node.data._estimated_time!='00:00'" class="_estimated_time">@[[ node.data._estimated_time ]] </span>
-                </span>
-            </el-popover>
-            </span>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="levelsDialogVisible = false">Cancel</el-button>
+      <el-button type="primary" @click="()=> { levelsDialogVisible = false; saveLevels() }">Confirm</el-button>
+    </span>
 
-            <span class="pull-right">
-                <span v-if="!!node.data.estimated_time" class="estimated_time">[[ node.data.estimated_time ]] <i class="fas fa-fire" style="font-size: 11px;"></i></span>
+  </el-dialog>
 
-                <el-button
-                    size="mini"
-                    icon="el-icon-plus"
-                    circle
-                    style="padding: 2px"
-                    @click="() => append(data)">
-                </el-button>
-                <el-dropdown @command="cmd=>handleTransferCommand(cmd,node)">
-                  <el-button
-                      size="mini"
-                      icon="el-icon-d-arrow-right"
-                      circle
-                      style="padding: 2px"
-                  >
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="mv">Move for tomorrow</el-dropdown-item>
-                    <el-dropdown-item command="cp">Copy for tomorrow</el-dropdown-item>
-                    <el-dropdown-item command="mcsd">To specific date...</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-
-                <el-button
-                    size="mini"
-                    icon="el-icon-delete"
-                    circle
-                    style="padding: 2px; margin-left: 15px"
-                    @click="() => remove(node)">
-                </el-button>
-
-            </span>
-
-        </span>
-    </el-tree>
-
-    <el-dialog
-        title="Transfer task"
-        :visible.sync="dialogVisible"
-        width="320px"
-        style="text-align: center"
-    >
-        <p>"[[ transferTask.label ]]"</p>
-
-        <el-select v-model="transferType" placeholder="Select">
-            <el-option key="1" label="Move" value="mv">Move</el-option>
-            <el-option key="2" label="Copy" value="cp">Copy</el-option>
-        </el-select>
-        <br/>
-        <br/>
-        <el-date-picker
-            v-model="transferDate"
-            type="date"
-            placeholder="Select Date"
-        >
-        </el-date-picker>
-        <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="()=> { dialogVisible = false; transferConfirm() }">Confirm</el-button>
-        </span>
-    </el-dialog>
-
-    <el-dialog
-        :visible.sync="levelsDialogVisible"
-        width="300px"
-        style="text-align: center"
-    >
-        <label class="level-label">Sleep</label><br/>
-        <el-input-number v-model="levels.sleep" :min="1" :step="0.5" :max="12" size="mini"></el-input-number>
-        <br/>
-
-        <label class="level-label">Caffeine</label><br/>
-        <el-input-number v-model="levels.caffeine" :min="1" :step="0.25" :max="10" size="mini"></el-input-number>
-        <br/>
-
-        <label class="level-label">Calmness</label>
-        <el-rate
-            v-model="levels.calmness"
-            :icon-classes="['fa fa-spa iconcalmness','fa fa-spa iconcalmness','fa fa-spa iconcalmness']"
-            :void-icon-class="'fa fa-spa iconcalmness'"
-            :colors="['#00a7e0','#00a7e0','#00a7e0']">
-        </el-rate>
-
-        <label class="level-label">Flow</label>
-        <el-rate
-            v-model="levels.groove"
-            :icon-classes="['fa fa-music icongroove','fa fa-music icongroove','fa fa-music icongroove']"
-            :void-icon-class="'fa fa-music icongroove'"
-            :colors="['#00a7e0','#00a7e0','#00a7e0']">
-        </el-rate>
-
-        <label class="level-label">Will</label>
-        <el-rate
-            v-model="levels.will"
-            :icon-classes="['fa fa-fire iconwill','fa fa-fire iconwill','fa fa-fire iconwill']"
-            :void-icon-class="'fa fa-fire iconwill'"
-            :colors="['#00a7e0','#00a7e0','#00a7e0']">
-        </el-rate>
-
-        <span slot="footer" class="dialog-footer">
-            <el-button @click="levelsDialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="()=> { levelsDialogVisible = false; saveLevels() }">Confirm</el-button>
-        </span>
-
-    </el-dialog>
-
-    <form method="post" ref="form">
-     <input type="hidden" name="nodes" id="nodes">
-     <input type="hidden" name="notes" id="notes">
-     <input type="hidden" name="expanded_nodes" id="expanded_nodes">
-     <input type="hidden" name="levels" id="levels">
-     <input type="hidden" name="transfer" id="transfer">
-    </form>
+  <form method="post" ref="form">
+    <input type="hidden" name="nodes" id="nodes">
+    <input type="hidden" name="notes" id="notes">
+    <input type="hidden" name="expanded_nodes" id="expanded_nodes">
+    <input type="hidden" name="levels" id="levels">
+    <input type="hidden" name="transfer" id="transfer">
+  </form>
 
 {% endblock %}
 
 {% block extra_js %}
-<script>
+  <script>
     var myNodes = {% if tree %}{{ tree.nodes_to_str() | safe }}{% else %}[]{% endif %};
-    var myDate = new Date({{ date.year }},{{ date.month - 1 }},{{ date.day }});
+    var myDate = new Date({{ date.year }}, {{ date.month - 1 }}, {{ date.day }});
     var myArray = {% if notes %}{{ notes.notes_to_str() | safe }}{% else %}[]{% endif %};
     var myExpandedNodes = {% if tree %}{{ tree.expanded_nodes_to_str() | safe }}{% else %}[]{% endif %};
-    var myLevels = {% if daily_data and daily_data.levels %}{{ daily_data.levels | safe }}{% else %}{sleep:6,caffeine:1,calmness:0,groove:0,will:0,}{% endif %}
-</script>
-<script src="/static/js/diary.js"></script>
+    var myLevels = {% if daily_data and daily_data.levels %}{{ daily_data.levels | safe }}{% else %}{
+      sleep: 6,
+      caffeine: 1,
+      calmness: 0,
+      groove: 0,
+      will: 0,
+    }
+    {% endif %}
+  </script>
+  <script src="/static/js/diary.js"></script>
 {% endblock %}

@@ -1,63 +1,52 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/static/css/index.css">
+  <link rel="stylesheet" href="/static/css/index.css">
 {% endblock %}
 
 {% block header %}
-
 {% endblock %}
 
 {% block content %}
-
-    <div style="text-align: center; padding-top: 25px">
+  <div style="text-align: center; padding-top: 25px">
     <img src="/static/img/undraw_hello.svg" alt="hello" style="width: 250px; height: 250px; opacity: .75">
-        <h3>Welcome!</h3>
-        <h4>start by <a href="/diary">adding today's tasks</a></h4>
-
-    </div>
-
+    <h3>Welcome!</h3>
+    <h4>start by <a href="/diary">adding today's tasks</a></h4>
+  </div>
 {% endblock %}
-
 
 {% block extra_js %}
-    <script>
-
-        let traverseById = (id, node, label) => {
-            console.log(node.label);
-            console.log(node);
-            let childIndex = 0;
-            // intentemaos chequiar
-            ////console.log(id === node.id);
-            if(node.id === id){
-                node.label = label;
-                return node;
-            } else {
-                if(!!node.children){
-                    node.children.forEach(node=>traverseById(id, node, label));
-                }else{
-                    return null;
-                }
-            }
-        };
-        var vue = new Vue({
-            el: '#app',
-            delimiters: ["[[", "]]"],
-            data: {
-                nodes: {% if tree %}{{ tree.nodes_to_str() | safe }}{% else %}[]{% endif %},
-                defaultProps: {
-                    children: 'children',
-                    label: 'label',
-                    time_spent: "time_spent"
-                },
-                date: null
-            },
-            methods: {
-
-            }
-        })
-
-
-    </script>
+  <script>
+    let traverseById = (id, node, label) => {
+      console.log(node.label);
+      console.log(node);
+      let childIndex = 0;
+      // intentemaos chequiar
+      ////console.log(id === node.id);
+      if (node.id === id) {
+        node.label = label;
+        return node;
+      } else {
+        if (!!node.children) {
+          node.children.forEach(node => traverseById(id, node, label));
+        } else {
+          return null;
+        }
+      }
+    };
+    var vue = new Vue({
+      el: '#app',
+      delimiters: ["[[", "]]"],
+      data: {
+        nodes: {% if tree %}{{ tree.nodes_to_str() | safe }}{% else %}[]{% endif %},
+        defaultProps: {
+          children: 'children',
+          label: 'label',
+          time_spent: "time_spent"
+        },
+        date: null
+      },
+      methods: {}
+    })
+  </script>
 {% endblock %}
-
