@@ -29,7 +29,8 @@
       <el-menu :default-openeds="['1', '3']" style="border-right: none">
 
 
-        <div style="padding: 15px 10px 15px 15px; background-color: white; margin-bottom: -15px; cursor: pointer;color:rgb(0, 167, 224)">
+        <div
+          style="padding: 15px 10px 15px 15px; background-color: white; margin-bottom: -15px; cursor: pointer;color:rgb(0, 167, 224)">
           <i class="fas fa-user-ninja"
              style="background-color: #d1e0f4; padding: 5px 5px 0 5px; border-radius: 5px; font-size: 25px; margin-right: 5px"></i>
           <el-dropdown trigger="click">
@@ -72,7 +73,7 @@
     <el-container>
 
       <el-header
-              style="text-align: right; font-size: 12px; background-color: #fafaff; z-index: 11; border-bottom: 1px solid rgb(238,241,246)">
+        style="text-align: right; font-size: 12px; background-color: #fafaff; z-index: 11; border-bottom: 1px solid rgb(238,241,246)">
         {% block header %}{% endblock %}
       </el-header>
 
@@ -84,14 +85,15 @@
               <div class="sidebar-offcanvas sidebar">
                 <div style="width: 100%; height: 35px">
                   <span style="font-size: 20px; font-weight: 400">Notes</span>
-                  <span><el-button
-                          icon="el-icon-plus"
-                          circle
-                          class="pull-right"
-                          style="padding: 5px"
-                          @click="() => newNote()"
-                  >
-                        </el-button></span>
+                  <span>
+                    <el-button
+                      icon="el-icon-plus"
+                      circle
+                      class="pull-right"
+                      style="padding: 5px"
+                      @click="() => newNote()"
+                    ></el-button>
+                  </span>
                 </div>
 
                 <draggable v-model="myArray" group="people" @start="drag=true" @end="drag=false" handle=".handle">
@@ -100,31 +102,30 @@
                     <div class="panel panel-default">
                       <div class="panel-heading handle">
                         <el-popover
-                                placement="bottom"
-                                title=""
-                                width="200"
-                                trigger="click"
-                                @show="()=>editNoteName(element.id)"
+                          placement="bottom"
+                          title=""
+                          width="200"
+                          trigger="click"
+                          @show="()=>editNoteName(element.id)"
                         >
                           <input
-                                  class="form-control input-sm"
-                                  :id="element.id+'_note_name'"
-                                  :value="element.name"
-                                  @change="(event) => noteNameChanged(event, element.id)"
+                            class="form-control input-sm"
+                            :id="element.id+'_note_name'"
+                            :value="element.name"
+                            @change="(event) => noteNameChanged(event, element.id)"
                           />
-
                           <span slot="reference" style="cursor: pointer">[[ element.name ]]</span>
                         </el-popover>
 
                         <span class="pull-right" style="margin-top: -5px; margin-right: -5px">
-                                        <el-button
-                                                size="mini"
-                                                icon="el-icon-delete"
-                                                circle
-                                                style="padding: 2px"
-                                                @click="() => deleteNote(element.id)">
-                                        </el-button>
-                                    </span>
+                          <el-button
+                            size="mini"
+                            icon="el-icon-delete"
+                            circle
+                            style="padding: 2px"
+                            @click="() => deleteNote(element.id)">
+                          </el-button>
+                        </span>
                       </div>
                       <div class="panel-body">
                         {#<textarea class="note-textarea" rows="5" v-model="element.text" >[[ element.text ]]</textarea>#}
@@ -144,7 +145,7 @@
               {% if request.url.path != "/" %}
                 <p class="pull-right">
                   <a type="button" class="btn btn-collapse btn-sm" data-toggle="offcanvas"><i
-                          class="glyphicon glyphicon-chevron-down"></i></a>
+                    class="glyphicon glyphicon-chevron-down"></i></a>
                 </p>
               {% endif %}
 
@@ -153,7 +154,8 @@
                 <br/>
               </div>
 
-              <div style="border-top: 1px solid #00a7e0; min-width: 100%; height: 55px; text-align: center; padding-top: 4px">
+              <div
+                style="border-top: 1px solid #00a7e0; min-width: 100%; height: 55px; text-align: center; padding-top: 4px">
                 <p class="col-sm-3 col-xs-6" style="margin-top: 12px; color: #00a7e0; font-size: 15px">
                   BurnThrough 0.0.1</p>
                 <div class="col-xs-6">
@@ -175,9 +177,9 @@
 </body>
 
 <script
-        src="https://code.jquery.com/jquery-3.4.0.slim.min.js"
-        integrity="sha256-ZaXnYkHGqIhqTbJ6MB4l9Frs/r7U4jlx7ir8PJYBqbI="
-        crossorigin="anonymous"></script>
+  src="https://code.jquery.com/jquery-3.4.0.slim.min.js"
+  integrity="sha256-ZaXnYkHGqIhqTbJ6MB4l9Frs/r7U4jlx7ir8PJYBqbI="
+  crossorigin="anonymous"></script>
 <script src="//unpkg.com/vue"></script>
 <script src="//unpkg.com/element-ui"></script>
 <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
