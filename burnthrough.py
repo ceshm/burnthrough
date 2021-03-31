@@ -26,7 +26,7 @@ import socket
 if ".local" not in socket.gethostname():
     #app.add_middleware(HTTPSRedirectMiddleware)
     pass
-app.mount('/static', StaticFiles(directory='statics'), name='statics')
+app.mount('/statics', StaticFiles(directory='statics'), name='statics')
 
 
 @app.route("/")
