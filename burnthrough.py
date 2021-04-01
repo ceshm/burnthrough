@@ -67,7 +67,7 @@ class LoginView(HTTPEndpoint):
             response.set_cookie("sessionid", usesh.sessionid)
             return response
         else:
-            return templates.TemplateResponse('login.html', {'request': request, 'error': "bad credentials" })
+            return templates.TemplateResponse('login.html', {'request': request, 'error': "bad credentials"})
 
 
 @app.route("/register")
@@ -79,10 +79,9 @@ class RegisterView(HTTPEndpoint):
 
     async def post(self, request, **kwargs):
         form = await request.form()
-        print(form["username"])
-        print(form["password"])
-        print(form["password_confirm"])
-
+        # print(form["username"])
+        # print(form["password"])
+        # print(form["password_confirm"])
 
         try:
             user = User.get(User.username==form["username"])
@@ -144,7 +143,15 @@ class DiarySpecificView(AuthEndpoint):
         except UserDailyData.DoesNotExist:
             daily_data = None
 
-        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date, "daily_data": daily_data})
+        return templates.TemplateResponse('diary.html', {
+          'request': request,
+          "tree": tree,
+          "date": date,
+          "notes": notes,
+          "prev_date": prev_date,
+          "next_date": next_date,
+          "daily_data": daily_data
+        })
 
     async def post(self, request):
         date = datetime.date.fromisoformat(request.path_params["date"])
@@ -248,7 +255,15 @@ class DiarySpecificView(AuthEndpoint):
             daily_data.data["levels"] = json_levels
             daily_data.save()
 
-        return templates.TemplateResponse('diary.html', {'request': request, "tree": tree, "date": date, "notes": notes, "prev_date": prev_date,  "next_date": next_date, "daily_data": daily_data })
+        return templates.TemplateResponse('diary.html', {
+          'request': request,
+          "tree": tree,
+          "date": date,
+          "notes": notes,
+          "prev_date": prev_date,
+          "next_date": next_date,
+          "daily_data": daily_data
+        })
 
 
 @app.route("/throughput")
@@ -267,7 +282,12 @@ class BurnDownView(AuthEndpoint):
     async def get(self, request):
         daily_tp, ptp_ratio, projects = get_burndown_data(2)
 
-        return templates.TemplateResponse('burn-down.html', {'request': request, "projects": projects, "daily_tp": daily_tp, "ptp_ratio": ptp_ratio })
+        return templates.TemplateResponse('burn-down.html', {
+          'request': request,
+          "projects": projects,
+          "daily_tp": daily_tp,
+          "ptp_ratio": ptp_ratio
+        })
 
     async def post(self, request):
 
