@@ -5,6 +5,7 @@ import string
 from functools import reduce
 
 import uvicorn
+import socket
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -22,10 +23,10 @@ app = Starlette(debug=True)
 app.add_middleware(AuthenticationMiddleware, backend=CookieBasedAuthBackend())
 
 templates = Jinja2Templates(directory='templates')
-import socket
 if ".local" not in socket.gethostname():
-    #app.add_middleware(HTTPSRedirectMiddleware)
+    # app.add_middleware(HTTPSRedirectMiddleware)
     pass
+
 app.mount('/statics', StaticFiles(directory='statics'), name='statics')
 
 
@@ -37,6 +38,20 @@ class HomepageView(AuthEndpoint):
 
     async def post(self, request):
         return templates.TemplateResponse('index.html', {'request': request })
+
+
+def get_user_session_response(user):
+    try:
+        usesh = UserSession.get(UserSession.user == user)
+    except UserSession.DoesNotExist:
+        usesh = UserSession()
+        usesh.user = user
+        usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        usesh.device = "device"
+        usesh.save()
+    response = RedirectResponse(url='/')
+    response.set_cookie("sessionid", usesh.sessionid)
+    return response
 
 
 @app.route("/login")
@@ -55,17 +70,7 @@ class LoginView(HTTPEndpoint):
         except User.DoesNotExist:
             user = None
         if user:
-            try:
-                usesh = UserSession.get(UserSession.user == user)
-            except UserSession.DoesNotExist:
-                usesh = UserSession()
-                usesh.user = user
-                usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-                usesh.device = "device"
-                usesh.save()
-            response = RedirectResponse(url='/')
-            response.set_cookie("sessionid", usesh.sessionid)
-            return response
+            return get_user_session_response(user)
         else:
             return templates.TemplateResponse('login.html', {'request': request, 'error': "bad credentials"})
 
@@ -79,12 +84,9 @@ class RegisterView(HTTPEndpoint):
 
     async def post(self, request, **kwargs):
         form = await request.form()
-        # print(form["username"])
-        # print(form["password"])
-        # print(form["password_confirm"])
 
         try:
-            user = User.get(User.username==form["username"])
+            user = User.get(User.username == form["username"])
         except User.DoesNotExist:
             user = None
         if user:
@@ -98,17 +100,7 @@ class RegisterView(HTTPEndpoint):
             user.password = form["password"]
             user.data = []
             user.save()
-            try:
-                usesh = UserSession.get(UserSession.user == user)
-            except UserSession.DoesNotExist:
-                usesh = UserSession()
-                usesh.user = user
-                usesh.sessionid = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-                usesh.device = "device"
-                usesh.save()
-            response = RedirectResponse(url='/')
-            response.set_cookie("sessionid", usesh.sessionid)
-            return response
+            return get_user_session_response(user)
 
 
 @app.route("/diary")
@@ -127,7 +119,6 @@ class DiarySpecificView(AuthEndpoint):
         prev_date = date - datetime.timedelta(days=1)
         next_date = date + datetime.timedelta(days=1)
 
-        #today = datetime.date(2019, 4, 16)
         try:
             tree = UserTaskTree.get(UserTaskTree.date == date, UserTaskTree.user == self.user)
             traverse_json_tree_list(tree.nodes)
@@ -161,8 +152,9 @@ class DiarySpecificView(AuthEndpoint):
 
         json_nodes = json.loads(form["nodes"])
         pre_actions = []
-        if "transfer" in form and form["transfer"]!="":
+        if "transfer" in form and form["transfer"] != "":
             json_transfer = json.loads(form["transfer"])
+
             def transfer(node, path):
                 selected_node = None
                 if json_transfer["node_id"] == node["id"]:
@@ -173,18 +165,18 @@ class DiarySpecificView(AuthEndpoint):
         try:
             tree = UserTaskTree.get(UserTaskTree.date == date,  UserTaskTree.user == self.user)
         except UserTaskTree.DoesNotExist:
-            #print("tree does not exist...")
             tree = UserTaskTree()
             tree.user = self.user
             tree.date = date
             tree.name = "awdawd"
+
+        pre_results = []
         if tree.nodes:
             try:
                 pre_results = traverse_json_tree_list(tree.nodes, actions=pre_actions)
             except:
                 pass
-        else:
-            pre_results = []
+
         for result in pre_results:
             print(result)
             if result["key"] == "transfer":
@@ -270,11 +262,11 @@ class DiarySpecificView(AuthEndpoint):
 class ThroughputView(AuthEndpoint):
     async def get(self, request):
         #today = datetime.date(2019, 4, 16)
-        return templates.TemplateResponse('throughput.html', {'request': request })
+        return templates.TemplateResponse('throughput.html', {'request': request})
 
     async def post(self, request):
 
-        return templates.TemplateResponse('throughput.html', {'request': request })
+        return templates.TemplateResponse('throughput.html', {'request': request})
 
 
 @app.route("/burn-down")
@@ -291,7 +283,7 @@ class BurnDownView(AuthEndpoint):
 
     async def post(self, request):
 
-        return templates.TemplateResponse('burn-down.html', {'request': request })
+        return templates.TemplateResponse('burn-down.html', {'request': request})
 
 
 @app.route('/logout')
@@ -299,7 +291,6 @@ async def logout(request):
     response = RedirectResponse(url='/login')
     response.delete_cookie("sessionid")
     return response
-
 
 
 if __name__ == "__main__":
